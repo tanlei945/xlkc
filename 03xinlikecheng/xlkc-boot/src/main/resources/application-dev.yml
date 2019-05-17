@@ -85,6 +85,7 @@ spring:
       datasource:
         master:
           url: jdbc:mysql://localhost:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+#          url: jdbc:mysql://106.13.63.238:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
           username: root
           password: 123456
           driver-class-name: com.mysql.jdbc.Driver
