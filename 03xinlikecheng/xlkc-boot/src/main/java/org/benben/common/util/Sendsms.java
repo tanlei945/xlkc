@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * 发送短信互亿无线验证码
  */
-public class Sensms {
+public class Sendsms {
 
 	private static String Url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit";
 
