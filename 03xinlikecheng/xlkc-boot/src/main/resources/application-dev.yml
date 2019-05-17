@@ -84,7 +84,7 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://106.13.63.238:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+          url: jdbc:mysql://localhost:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
           username: root
           password: 123456
           driver-class-name: com.mysql.jdbc.Driver
@@ -141,13 +141,13 @@ wecat:
   appId: wx4efe77aac1e735c6
   appSecret: 5c5de6885810fc002a351c8654809ed6
   token: cloudtop
-  backUrl: http://phsmcf.natappfree.cc/benben-boot/api/user/wx_login_callBack
+  backUrl: http://phsmcf.natappfree.cc/xlkc-boot/api/user/wx_login_callBack
 
 #微博
 weibo:
   appId: 1768380590
   appSecret: 33bf157d02042a50e080101e003d037e
-  backUrl: http://phsmcf.natappfree.cc/benben-boot/api/user/wb_login_callback
+  backUrl: http://phsmcf.natappfree.cc/xlkc-boot/api/user/wb_login_callback
 
 #邮箱
 mail:
