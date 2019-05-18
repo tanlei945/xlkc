@@ -23,6 +23,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.benben.modules.business.course.vo.CourseQueryVo;
+import org.benben.modules.business.coursetype.entity.CourseType;
+import org.benben.modules.business.coursetype.service.ICourseTypeService;
+import org.benben.modules.business.information.entity.InformationDTO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -50,6 +54,11 @@ import com.alibaba.fastjson.JSON;
 public class CourseDTOController {
 	@Autowired
 	private ICourseDTOService courseDTOService;
+
+	@Autowired
+	private ICourseTypeService courseTypeService;
+
+
 	
 	/**
 	  * 分页列表查询
@@ -60,7 +69,7 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	@ApiOperation(value = "查询课程列表", tags = {"查询课程列表"}, notes = "查询课程列表")
+	@ApiOperation(value = "查询课程列表", tags = {"课程模块"}, notes = "查询课程列表")
 	public Result<IPage<CourseDTO>> queryPageList(CourseDTO courseDTO,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -80,7 +89,7 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "新增课程", tags = {"新增课程"}, notes = "新增课程")
+	@ApiOperation(value = "新增课程", tags = {"课程模块"}, notes = "新增课程")
 	public Result<CourseDTO> add(@RequestBody CourseDTO courseDTO) {
 		Result<CourseDTO> result = new Result<CourseDTO>();
 		try {
@@ -101,7 +110,7 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	@ApiOperation(value = "修改课程", tags = {"修改课程"}, notes = "修改课程")
+	@ApiOperation(value = "修改课程", tags = {"课程模块"}, notes = "修改课程")
 	public Result<CourseDTO> edit(@RequestBody CourseDTO courseDTO) {
 		Result<CourseDTO> result = new Result<CourseDTO>();
 		CourseDTO courseDTOEntity = courseDTOService.getById(courseDTO.getId());
@@ -124,7 +133,7 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	@ApiOperation(value = "删除课程", tags = {"删除课程"}, notes = "删除课程")
+	@ApiOperation(value = "删除课程", tags = {"课程模块"}, notes = "删除课程")
 	public Result<CourseDTO> delete(@RequestParam(name="id",required=true) String id) {
 		Result<CourseDTO> result = new Result<CourseDTO>();
 		CourseDTO courseDTO = courseDTOService.getById(id);
@@ -146,7 +155,7 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	@ApiOperation(value = "批量删除课程", tags = {"批量删除课程"}, notes = "批量删除课程")
+	@ApiOperation(value = "批量删除课程", tags = {"课程模块"}, notes = "批量删除课程")
 	public Result<CourseDTO> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<CourseDTO> result = new Result<CourseDTO>();
 		if(ids==null || "".equals(ids.trim())) {
@@ -164,10 +173,12 @@ public class CourseDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	@ApiOperation(value = "查询课程详情", tags = {"查询课程详情"}, notes = "查询课程详情")
+	@ApiOperation(value = "查询课程详情", tags = {"课程模块"}, notes = "查询课程详情")
 	public Result<CourseDTO> queryById(@RequestParam(name="id",required=true) String id) {
 		Result<CourseDTO> result = new Result<CourseDTO>();
 		CourseDTO courseDTO = courseDTOService.getById(id);
+		CourseType courseType = courseTypeService.getById(courseDTO.getCourseType());
+		courseDTO.setCourseTypeName(courseType.getName());
 		if(courseDTO==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -176,6 +187,44 @@ public class CourseDTOController {
 		}
 		return result;
 	}
+
+
+	 /**
+	  * 搜索课程列表
+	  * @param courseQueryVo
+	  * @param pageNo
+	  * @param pageSize
+	  * @return
+	  */
+	 @GetMapping(value = "/search")
+	 @ApiOperation(value = "搜索课程列表", tags = {"课程模块"}, notes = "搜索课程列表")
+	 public Result<IPage<CourseDTO>> searchCourse(CourseQueryVo courseQueryVo,
+												  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+												  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+		 Result<IPage<CourseDTO>> result = new Result<IPage<CourseDTO>>();
+		 IPage<CourseDTO> pageList = courseDTOService.searchNotice(pageNo, pageSize, courseQueryVo);
+		 result.setSuccess(true);
+		 result.setResult(pageList);
+		 return result;
+	 }
+
+	 /**
+	  * 课程报名
+	  * @param courseId
+	  * @return
+	  */
+	 @GetMapping(value = "/update/num")
+	 @ApiOperation(value = "课程报名", tags = {"课程模块"}, notes = "课程报名")
+	 public Result<CourseDTO> updateCourseNum(String courseId, InformationDTO informationDTO){
+		 // TODO: 2019/5/18 0018 微信支付相关功能
+	 	return null;
+	 }
+
+
+
+
+
+
 
   /**
       * 导出excel
