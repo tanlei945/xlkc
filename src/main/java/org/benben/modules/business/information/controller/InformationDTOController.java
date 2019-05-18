@@ -1,4 +1,4 @@
-package org.benben.modules.business.banner.controller;
+package org.benben.modules.business.information.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +13,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
-import org.benben.common.util.UUIDGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.banner.entity.BannerDTO;
-import org.benben.modules.business.banner.service.IBannerDTOService;
+import org.benben.modules.business.information.entity.InformationDTO;
+import org.benben.modules.business.information.service.IInformationDTOService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -38,39 +37,37 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 轮播图模块
+ * @Description: 课程预约的个人信息
  * @author： jeecg-boot
  * @date：   2019-05-18
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/banner")
+@RequestMapping("/information/informationDTO")
 @Slf4j
-@Api(tags = {
-		"轮播图模块"
-})
-public class BannerDTOController {
+@Api(tags = {"课程预约的个人信息"})
+public class InformationDTOController {
 	@Autowired
-	private IBannerDTOService bannerDTOService;
+	private IInformationDTOService informationDTOService;
 	
 	/**
 	  * 分页列表查询
-	 * @param bannerDTO
+	 * @param informationDTO
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	@ApiOperation(value = "查询轮播图列表", tags = {"轮播图模块"}, notes = "查询轮播图列表")
-	public Result<IPage<BannerDTO>> queryPageList(BannerDTO bannerDTO,
+	@ApiOperation(tags = {"课程预约的个人信息"}, notes = "个人信息列表", value = "个人信息列表")
+	public Result<IPage<InformationDTO>> queryPageList(InformationDTO informationDTO,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<BannerDTO>> result = new Result<IPage<BannerDTO>>();
-		QueryWrapper<BannerDTO> queryWrapper = QueryGenerator.initQueryWrapper(bannerDTO, req.getParameterMap());
-		Page<BannerDTO> page = new Page<BannerDTO>(pageNo, pageSize);
-		IPage<BannerDTO> pageList = bannerDTOService.page(page, queryWrapper);
+		Result<IPage<InformationDTO>> result = new Result<IPage<InformationDTO>>();
+		QueryWrapper<InformationDTO> queryWrapper = QueryGenerator.initQueryWrapper(informationDTO, req.getParameterMap());
+		Page<InformationDTO> page = new Page<InformationDTO>(pageNo, pageSize);
+		IPage<InformationDTO> pageList = informationDTOService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -78,16 +75,14 @@ public class BannerDTOController {
 	
 	/**
 	  *   添加
-	 * @param bannerDTO
+	 * @param informationDTO
 	 * @return
 	 */
-	@PostMapping(value = "/add")
-	@ApiOperation(value = "新增轮播图", tags = {"轮播图模块"}, notes = "新增轮播图")
-	public Result<BannerDTO> add(@RequestBody BannerDTO bannerDTO) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
+//	@PostMapping(value = "/add")
+	public Result<InformationDTO> add(@RequestBody InformationDTO informationDTO) {
+		Result<InformationDTO> result = new Result<InformationDTO>();
 		try {
-			bannerDTO.setId(UUIDGenerator.generate());
-			bannerDTOService.save(bannerDTO);
+			informationDTOService.save(informationDTO);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -99,18 +94,17 @@ public class BannerDTOController {
 	
 	/**
 	  *  编辑
-	 * @param bannerDTO
+	 * @param informationDTO
 	 * @return
 	 */
-	@PutMapping(value = "/edit")
-	@ApiOperation(value = "修改轮播图", tags = {"轮播图模块"}, notes = "修改轮播图")
-	public Result<BannerDTO> edit(@RequestBody BannerDTO bannerDTO) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTOEntity = bannerDTOService.getById(bannerDTO.getId());
-		if(bannerDTOEntity==null) {
+//	@PutMapping(value = "/edit")
+	public Result<InformationDTO> edit(@RequestBody InformationDTO informationDTO) {
+		Result<InformationDTO> result = new Result<InformationDTO>();
+		InformationDTO informationDTOEntity = informationDTOService.getById(informationDTO.getId());
+		if(informationDTOEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = bannerDTOService.updateById(bannerDTO);
+			boolean ok = informationDTOService.updateById(informationDTO);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -125,15 +119,14 @@ public class BannerDTOController {
 	 * @param id
 	 * @return
 	 */
-	@DeleteMapping(value = "/delete")
-	@ApiOperation(value = "删除轮播图", tags = {"轮播图模块"}, notes = "删除轮播图")
-	public Result<BannerDTO> delete(@RequestParam(name="id",required=true) String id) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTO = bannerDTOService.getById(id);
-		if(bannerDTO==null) {
+//	@DeleteMapping(value = "/delete")
+	public Result<InformationDTO> delete(@RequestParam(name="id",required=true) String id) {
+		Result<InformationDTO> result = new Result<InformationDTO>();
+		InformationDTO informationDTO = informationDTOService.getById(id);
+		if(informationDTO==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = bannerDTOService.removeById(id);
+			boolean ok = informationDTOService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -147,14 +140,13 @@ public class BannerDTOController {
 	 * @param ids
 	 * @return
 	 */
-	@DeleteMapping(value = "/deleteBatch")
-	@ApiOperation(value = "批量删除轮播图", tags = {"轮播图模块"}, notes = "批量删除轮播图")
-	public Result<BannerDTO> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
+//	@DeleteMapping(value = "/deleteBatch")
+	public Result<InformationDTO> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<InformationDTO> result = new Result<InformationDTO>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.bannerDTOService.removeByIds(Arrays.asList(ids.split(",")));
+			this.informationDTOService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -166,14 +158,14 @@ public class BannerDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	@ApiOperation(value = "查询轮播图详情", tags = {"轮播图模块"}, notes = "查询轮播图详情·")
-	public Result<BannerDTO> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTO = bannerDTOService.getById(id);
-		if(bannerDTO==null) {
+	@ApiOperation(tags = {"课程预约的个人信息"}, notes = "查询个人信息详情", value = "查询个人信息详情")
+	public Result<InformationDTO> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<InformationDTO> result = new Result<InformationDTO>();
+		InformationDTO informationDTO = informationDTOService.getById(id);
+		if(informationDTO==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(bannerDTO);
+			result.setResult(informationDTO);
 			result.setSuccess(true);
 		}
 		return result;
@@ -188,13 +180,13 @@ public class BannerDTOController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<BannerDTO> queryWrapper = null;
+      QueryWrapper<InformationDTO> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              BannerDTO bannerDTO = JSON.parseObject(deString, BannerDTO.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(bannerDTO, request.getParameterMap());
+              InformationDTO informationDTO = JSON.parseObject(deString, InformationDTO.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(informationDTO, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -202,11 +194,11 @@ public class BannerDTOController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<BannerDTO> pageList = bannerDTOService.list(queryWrapper);
+      List<InformationDTO> pageList = informationDTOService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "轮播图模块列表");
-      mv.addObject(NormalExcelConstants.CLASS, BannerDTO.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("轮播图模块列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "课程预约的个人信息列表");
+      mv.addObject(NormalExcelConstants.CLASS, InformationDTO.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("课程预约的个人信息列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -229,11 +221,11 @@ public class BannerDTOController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<BannerDTO> listBannerDTOs = ExcelImportUtil.importExcel(file.getInputStream(), BannerDTO.class, params);
-              for (BannerDTO bannerDTOExcel : listBannerDTOs) {
-                  bannerDTOService.save(bannerDTOExcel);
+              List<InformationDTO> listInformationDTOs = ExcelImportUtil.importExcel(file.getInputStream(), InformationDTO.class, params);
+              for (InformationDTO informationDTOExcel : listInformationDTOs) {
+                  informationDTOService.save(informationDTOExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listBannerDTOs.size());
+              return Result.ok("文件导入成功！数据行数：" + listInformationDTOs.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

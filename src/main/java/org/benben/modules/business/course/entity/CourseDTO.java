@@ -23,7 +23,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @ApiModel("课程信息")
 public class CourseDTO implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
 	/**主键ID*/
 	@TableId(type = IdType.UUID)
 	@ApiModelProperty("主键")
@@ -97,7 +97,7 @@ public class CourseDTO implements Serializable {
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty("创建人时间")
-	private java.util.Date createTiem;
+	private java.util.Date createTime;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
 	private java.lang.String createBy;
@@ -110,4 +110,20 @@ public class CourseDTO implements Serializable {
 	/**修改人*/
 	@Excel(name = "修改人", width = 15)
 	private java.lang.String updateBy;
+	/**
+	 * 课程类型
+	 */
+	@ApiModelProperty("课程类型")
+	private java.lang.String courseType;
+	/**
+	 * 课程类型名称
+	 */
+	@ApiModelProperty("课程类型名称")
+	private java.lang.String courseTypeName;
+
+	/**
+	 * 已报名人数
+	 */
+	@ApiModelProperty("已报名人数")
+	private java.lang.Integer enterNum;
 }

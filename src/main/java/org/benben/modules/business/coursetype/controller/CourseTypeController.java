@@ -1,4 +1,4 @@
-package org.benben.modules.business.banner.controller;
+package org.benben.modules.business.coursetype.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,10 +13,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
-import org.benben.common.util.UUIDGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.banner.entity.BannerDTO;
-import org.benben.modules.business.banner.service.IBannerDTOService;
+import org.benben.modules.business.coursetype.entity.CourseType;
+import org.benben.modules.business.coursetype.service.ICourseTypeService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -38,39 +37,37 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 轮播图模块
+ * @Description: 课程类型
  * @author： jeecg-boot
  * @date：   2019-05-18
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/banner")
+@RequestMapping("/api/v1/coursetype")
 @Slf4j
-@Api(tags = {
-		"轮播图模块"
-})
-public class BannerDTOController {
+@Api(tags = {"课程类型模块"})
+public class CourseTypeController {
 	@Autowired
-	private IBannerDTOService bannerDTOService;
+	private ICourseTypeService courseTypeService;
 	
 	/**
 	  * 分页列表查询
-	 * @param bannerDTO
+	 * @param courseType
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	@ApiOperation(value = "查询轮播图列表", tags = {"轮播图模块"}, notes = "查询轮播图列表")
-	public Result<IPage<BannerDTO>> queryPageList(BannerDTO bannerDTO,
+	@ApiOperation(tags = {"课程类型模块"}, value = "查询课程类型列表", notes = "查询课程类型列表")
+	public Result<IPage<CourseType>> queryPageList(CourseType courseType,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<BannerDTO>> result = new Result<IPage<BannerDTO>>();
-		QueryWrapper<BannerDTO> queryWrapper = QueryGenerator.initQueryWrapper(bannerDTO, req.getParameterMap());
-		Page<BannerDTO> page = new Page<BannerDTO>(pageNo, pageSize);
-		IPage<BannerDTO> pageList = bannerDTOService.page(page, queryWrapper);
+		Result<IPage<CourseType>> result = new Result<IPage<CourseType>>();
+		QueryWrapper<CourseType> queryWrapper = QueryGenerator.initQueryWrapper(courseType, req.getParameterMap());
+		Page<CourseType> page = new Page<CourseType>(pageNo, pageSize);
+		IPage<CourseType> pageList = courseTypeService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -78,16 +75,15 @@ public class BannerDTOController {
 	
 	/**
 	  *   添加
-	 * @param bannerDTO
+	 * @param courseType
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "新增轮播图", tags = {"轮播图模块"}, notes = "新增轮播图")
-	public Result<BannerDTO> add(@RequestBody BannerDTO bannerDTO) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
+	@ApiOperation(tags = {"课程类型模块"}, value = "新增课程类型", notes = "新增课程类型")
+	public Result<CourseType> add(@RequestBody CourseType courseType) {
+		Result<CourseType> result = new Result<CourseType>();
 		try {
-			bannerDTO.setId(UUIDGenerator.generate());
-			bannerDTOService.save(bannerDTO);
+			courseTypeService.save(courseType);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -99,18 +95,18 @@ public class BannerDTOController {
 	
 	/**
 	  *  编辑
-	 * @param bannerDTO
+	 * @param courseType
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	@ApiOperation(value = "修改轮播图", tags = {"轮播图模块"}, notes = "修改轮播图")
-	public Result<BannerDTO> edit(@RequestBody BannerDTO bannerDTO) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTOEntity = bannerDTOService.getById(bannerDTO.getId());
-		if(bannerDTOEntity==null) {
+	@ApiOperation(tags = {"课程类型模块"}, value = "修改课程类型", notes = "修改课程类型")
+	public Result<CourseType> edit(@RequestBody CourseType courseType) {
+		Result<CourseType> result = new Result<CourseType>();
+		CourseType courseTypeEntity = courseTypeService.getById(courseType.getId());
+		if(courseTypeEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = bannerDTOService.updateById(bannerDTO);
+			boolean ok = courseTypeService.updateById(courseType);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -126,14 +122,14 @@ public class BannerDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	@ApiOperation(value = "删除轮播图", tags = {"轮播图模块"}, notes = "删除轮播图")
-	public Result<BannerDTO> delete(@RequestParam(name="id",required=true) String id) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTO = bannerDTOService.getById(id);
-		if(bannerDTO==null) {
+	@ApiOperation(tags = {"课程类型模块"}, value = "删除课程类型", notes = "删除课程类型")
+	public Result<CourseType> delete(@RequestParam(name="id",required=true) String id) {
+		Result<CourseType> result = new Result<CourseType>();
+		CourseType courseType = courseTypeService.getById(id);
+		if(courseType==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = bannerDTOService.removeById(id);
+			boolean ok = courseTypeService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -148,13 +144,13 @@ public class BannerDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	@ApiOperation(value = "批量删除轮播图", tags = {"轮播图模块"}, notes = "批量删除轮播图")
-	public Result<BannerDTO> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
+	@ApiOperation(tags = {"课程类型模块"}, value = "批量删除课程类型", notes = "批量删除课程类型")
+	public Result<CourseType> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<CourseType> result = new Result<CourseType>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.bannerDTOService.removeByIds(Arrays.asList(ids.split(",")));
+			this.courseTypeService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -166,14 +162,14 @@ public class BannerDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	@ApiOperation(value = "查询轮播图详情", tags = {"轮播图模块"}, notes = "查询轮播图详情·")
-	public Result<BannerDTO> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<BannerDTO> result = new Result<BannerDTO>();
-		BannerDTO bannerDTO = bannerDTOService.getById(id);
-		if(bannerDTO==null) {
+	@ApiOperation(tags = {"课程类型模块"}, value = "查询课程详情", notes = "查询课程详情")
+	public Result<CourseType> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<CourseType> result = new Result<CourseType>();
+		CourseType courseType = courseTypeService.getById(id);
+		if(courseType==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(bannerDTO);
+			result.setResult(courseType);
 			result.setSuccess(true);
 		}
 		return result;
@@ -188,13 +184,13 @@ public class BannerDTOController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<BannerDTO> queryWrapper = null;
+      QueryWrapper<CourseType> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              BannerDTO bannerDTO = JSON.parseObject(deString, BannerDTO.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(bannerDTO, request.getParameterMap());
+              CourseType courseType = JSON.parseObject(deString, CourseType.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(courseType, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -202,11 +198,11 @@ public class BannerDTOController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<BannerDTO> pageList = bannerDTOService.list(queryWrapper);
+      List<CourseType> pageList = courseTypeService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "轮播图模块列表");
-      mv.addObject(NormalExcelConstants.CLASS, BannerDTO.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("轮播图模块列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "课程类型列表");
+      mv.addObject(NormalExcelConstants.CLASS, CourseType.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("课程类型列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -229,11 +225,11 @@ public class BannerDTOController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<BannerDTO> listBannerDTOs = ExcelImportUtil.importExcel(file.getInputStream(), BannerDTO.class, params);
-              for (BannerDTO bannerDTOExcel : listBannerDTOs) {
-                  bannerDTOService.save(bannerDTOExcel);
+              List<CourseType> listCourseTypes = ExcelImportUtil.importExcel(file.getInputStream(), CourseType.class, params);
+              for (CourseType courseTypeExcel : listCourseTypes) {
+                  courseTypeService.save(courseTypeExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listBannerDTOs.size());
+              return Result.ok("文件导入成功！数据行数：" + listCourseTypes.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

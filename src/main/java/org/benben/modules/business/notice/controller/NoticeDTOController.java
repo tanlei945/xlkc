@@ -1,6 +1,7 @@
 package org.benben.modules.business.notice.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
+import org.benben.common.util.UUIDGenerator;
 import org.benben.common.util.oConvertUtils;
 import org.benben.modules.business.notice.entity.NoticeDTO;
 import org.benben.modules.business.notice.service.INoticeDTOService;
@@ -61,7 +63,7 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	@ApiOperation(value = "查询通知列表", tags = {"查询通知列表"}, notes = "查询通知列表")
+	@ApiOperation(value = "查询通知列表", tags = {"通知模块"}, notes = "查询通知列表")
 	public Result<IPage<NoticeDTO>> queryPageList(NoticeDTO noticeDTO,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -81,10 +83,13 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "新增通知", tags = {"新增通知"}, notes = "新增通知")
+	@ApiOperation(value = "新增通知", tags = {"通知模块"}, notes = "新增通知")
 	public Result<NoticeDTO> add(@RequestBody NoticeDTO noticeDTO) {
 		Result<NoticeDTO> result = new Result<NoticeDTO>();
 		try {
+			noticeDTO.setId(UUIDGenerator.generate());
+			noticeDTO.setCreateTime(new Date());
+			noticeDTO.setUpdateTime(new Date());
 			noticeDTOService.save(noticeDTO);
 			result.success("添加成功！");
 		} catch (Exception e) {
@@ -101,13 +106,14 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	@ApiOperation(value = "修改通知", tags = {"修改通知"}, notes = "修改通知")
+	@ApiOperation(value = "修改通知", tags = {"通知模块"}, notes = "修改通知")
 	public Result<NoticeDTO> edit(@RequestBody NoticeDTO noticeDTO) {
 		Result<NoticeDTO> result = new Result<NoticeDTO>();
 		NoticeDTO noticeDTOEntity = noticeDTOService.getById(noticeDTO.getId());
 		if(noticeDTOEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
+			noticeDTO.setUpdateTime(new Date());
 			boolean ok = noticeDTOService.updateById(noticeDTO);
 			//TODO 返回false说明什么？
 			if(ok) {
@@ -124,7 +130,7 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	@ApiOperation(value = "删除通知", tags = {"删除通知"}, notes = "删除通知")
+	@ApiOperation(value = "删除通知", tags = {"通知模块"}, notes = "删除通知")
 	public Result<NoticeDTO> delete(@RequestParam(name="id",required=true) String id) {
 		Result<NoticeDTO> result = new Result<NoticeDTO>();
 		NoticeDTO noticeDTO = noticeDTOService.getById(id);
@@ -146,7 +152,7 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	@ApiOperation(value = "批量删除通知", tags = {"批量删除通知"}, notes = "批量删除通知")
+	@ApiOperation(value = "批量删除通知", tags = {"通知模块"}, notes = "批量删除通知")
 	public Result<NoticeDTO> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<NoticeDTO> result = new Result<NoticeDTO>();
 		if(ids==null || "".equals(ids.trim())) {
@@ -164,7 +170,7 @@ public class NoticeDTOController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	@ApiOperation(value = "查询通知详情", tags = {"查询通知详情"}, notes = "查询通知详情")
+	@ApiOperation(value = "查询通知详情", tags = {"通知模块"}, notes = "查询通知详情")
 	public Result<NoticeDTO> queryById(@RequestParam(name="id",required=true) String id) {
 		Result<NoticeDTO> result = new Result<NoticeDTO>();
 		NoticeDTO noticeDTO = noticeDTOService.getById(id);
