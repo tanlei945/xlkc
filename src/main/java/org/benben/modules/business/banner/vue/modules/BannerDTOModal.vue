@@ -14,20 +14,50 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="和帖子相关联id">
-          <a-input-number v-decorator="[ 'postsId', {}]" />
+          label="课程相关联id">
+          <a-input placeholder="请输入课程相关联id" v-decorator="['courseId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="消息名称">
-          <a-input placeholder="请输入消息名称" v-decorator="['name', {}]" />
+          label="书籍相关联id">
+          <a-input placeholder="请输入书籍相关联id" v-decorator="['bookId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="消息的描述">
-          <a-input placeholder="请输入消息的描述" v-decorator="['comment', {}]" />
+          label="1/首页轮播图  2/帖子轮播图 3/书本轮播图">
+          <a-input-number v-decorator="[ 'homepage', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="图片地址">
+          <a-input placeholder="请输入图片地址" v-decorator="['imgUrl', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="图片大小 单位：字节">
+          <a-input-number v-decorator="[ 'imgSize', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="是否删除：0-已删除  1-未删除">
+          <a-input placeholder="请输入是否删除：0-已删除  1-未删除" v-decorator="['delFlag', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="是否有用：0-不启用 1-启用">
+          <a-input placeholder="请输入是否有用：0-不启用 1-启用" v-decorator="['useFlag', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="描述">
+          <a-input placeholder="请输入描述" v-decorator="['description', {}]" />
         </a-form-item>
 		
       </a-form>
@@ -41,7 +71,7 @@
   import moment from "moment"
 
   export default {
-    name: "NoticeDTOModal",
+    name: "BannerDTOModal",
     data () {
       return {
         title:"操作",
@@ -61,8 +91,8 @@
         validatorRules:{
         },
         url: {
-          add: "/notice/noticeDTO/add",
-          edit: "/notice/noticeDTO/edit",
+          add: "/banner/bannerDTO/add",
+          edit: "/banner/bannerDTO/edit",
         },
       }
     },
@@ -77,7 +107,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'postsId','name','comment'))
+          this.form.setFieldsValue(pick(this.model,'courseId','bookId','homepage','imgUrl','imgSize','delFlag','useFlag','description'))
 		  //时间格式化
         });
 

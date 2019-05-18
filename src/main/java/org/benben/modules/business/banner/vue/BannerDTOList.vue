@@ -7,19 +7,29 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="和帖子相关联id">
-              <a-input placeholder="请输入和帖子相关联id" v-model="queryParam.postsId"></a-input>
+            <a-form-item label="课程相关联id">
+              <a-input placeholder="请输入课程相关联id" v-model="queryParam.courseId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="消息名称">
-              <a-input placeholder="请输入消息名称" v-model="queryParam.name"></a-input>
+            <a-form-item label="书籍相关联id">
+              <a-input placeholder="请输入书籍相关联id" v-model="queryParam.bookId"></a-input>
             </a-form-item>
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
-            <a-form-item label="消息的描述">
-              <a-input placeholder="请输入消息的描述" v-model="queryParam.comment"></a-input>
+            <a-form-item label="1/首页轮播图  2/帖子轮播图 3/书本轮播图">
+              <a-input placeholder="请输入1/首页轮播图  2/帖子轮播图 3/书本轮播图" v-model="queryParam.homepage"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="图片地址">
+              <a-input placeholder="请输入图片地址" v-model="queryParam.imgUrl"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="图片大小 单位：字节">
+              <a-input placeholder="请输入图片大小 单位：字节" v-model="queryParam.imgSize"></a-input>
             </a-form-item>
           </a-col>
         </template>
@@ -93,23 +103,23 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <noticeDTO-modal ref="modalForm" @ok="modalFormOk"></noticeDTO-modal>
+    <bannerDTO-modal ref="modalForm" @ok="modalFormOk"></bannerDTO-modal>
   </a-card>
 </template>
 
 <script>
-  import NoticeDTOModal from './modules/NoticeDTOModal'
+  import BannerDTOModal from './modules/BannerDTOModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "NoticeDTOList",
+    name: "BannerDTOList",
     mixins:[JeecgListMixin],
     components: {
-      NoticeDTOModal
+      BannerDTOModal
     },
     data () {
       return {
-        description: '用户通知管理页面',
+        description: '轮播图模块管理页面',
         // 表头
         columns: [
           {
@@ -123,19 +133,44 @@
             }
            },
 		   {
-            title: '和帖子相关联id',
+            title: '课程相关联id',
             align:"center",
-            dataIndex: 'postsId'
+            dataIndex: 'courseId'
            },
 		   {
-            title: '消息名称',
+            title: '书籍相关联id',
             align:"center",
-            dataIndex: 'name'
+            dataIndex: 'bookId'
            },
 		   {
-            title: '消息的描述',
+            title: '1/首页轮播图  2/帖子轮播图 3/书本轮播图',
             align:"center",
-            dataIndex: 'comment'
+            dataIndex: 'homepage'
+           },
+		   {
+            title: '图片地址',
+            align:"center",
+            dataIndex: 'imgUrl'
+           },
+		   {
+            title: '图片大小 单位：字节',
+            align:"center",
+            dataIndex: 'imgSize'
+           },
+		   {
+            title: '是否删除：0-已删除  1-未删除',
+            align:"center",
+            dataIndex: 'delFlag'
+           },
+		   {
+            title: '是否有用：0-不启用 1-启用',
+            align:"center",
+            dataIndex: 'useFlag'
+           },
+		   {
+            title: '描述',
+            align:"center",
+            dataIndex: 'description'
            },
           {
             title: '操作',
@@ -145,11 +180,11 @@
           }
         ],
 		url: {
-          list: "/notice/noticeDTO/list",
-          delete: "/notice/noticeDTO/delete",
-          deleteBatch: "/notice/noticeDTO/deleteBatch",
-          exportXlsUrl: "notice/noticeDTO/exportXls",
-          importExcelUrl: "notice/noticeDTO/importExcel",
+          list: "/banner/bannerDTO/list",
+          delete: "/banner/bannerDTO/delete",
+          deleteBatch: "/banner/bannerDTO/deleteBatch",
+          exportXlsUrl: "banner/bannerDTO/exportXls",
+          importExcelUrl: "banner/bannerDTO/importExcel",
        },
     }
   },
