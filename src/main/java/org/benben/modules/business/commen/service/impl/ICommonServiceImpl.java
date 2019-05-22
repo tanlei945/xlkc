@@ -30,6 +30,7 @@ public class ICommonServiceImpl implements ICommonService {
             if (!file.exists()) {
                 file.mkdirs();// 创建文件根目录
             }
+
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             MultipartFile mf = multipartRequest.getFile("file");// 获取上传文件对象
             String orgName = mf.getOriginalFilename();// 获取文件名
@@ -56,7 +57,8 @@ public class ICommonServiceImpl implements ICommonService {
             String fileName = null;
             String bizPath = "user";
             String nowday = new SimpleDateFormat("yyyyMMdd").format(new Date());
-            File file = new File(ctxPath + File.separator + bizPath + File.separator + nowday);
+//            File file = new File(ctxPath + File.separator + bizPath + File.separator + nowday);
+            File file = new File(ctxPath + File.separator + bizPath + File.separator);
             if (!file.exists()) {
                 file.mkdirs();// 创建文件根目录
             }

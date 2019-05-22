@@ -30,6 +30,7 @@ import org.benben.modules.business.user.entity.UserThird;
 import org.benben.modules.business.user.service.IUserService;
 import org.benben.modules.business.user.service.IUserThirdService;
 import org.benben.modules.shiro.authc.util.JwtUtil;
+import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -78,20 +79,49 @@ public class RestUserController {
     @Autowired
     private RedisUtil redisUtil;
 
+	@PostMapping(value = "/verify_user")
+//	@ApiOperation(value = "验证是否完善个人资料", tags = "用户接口",notes = "验证是否完善个人资料")
+	public RestResponseBean verifyUser(@RequestParam String chinaname, @RequestParam String englishname, @RequestParam String referrer) {
+		if (!StringUtils.isNotBlank(chinaname) || !StringUtils.isNotBlank(englishname) || !StringUtils.isNotBlank(referrer)) {
+			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(), ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
+		}
+		User user = userService.verifyUser(chinaname, englishname, referrer);
+		if (user != null) {
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"已完善");
+		}
+		return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(), ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
+	}
 
-
+	/**
+	 * 更新用户信息
+	 * @param user
+	 * @return
+	 */
+	@PostMapping(value = "/updateUser")
+	@ApiOperation(value = "更新用户信息",tags = "用户接口",notes = "更新用户信息")
+	public RestResponseBean updateUser(@RequestBody User user){
+		//判断用户信息是否为空
+		if(user==null) {
+			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
+		}
+		if (userService.updateById(user)){
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"更新用户成功！");
+		}
+		return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
+	}
     /**
      * 通过id查询
      * @param id
      * @return
      */
     @GetMapping(value = "/queryById")
-    @ApiOperation(value = "通过id查询用户", tags = {"用户接口"}, notes = "通过id查询用户")
+//   @ApiOperation(value = "通过id查询用户", tags = {"用户接口"}, notes = "通过id查询用户")
+	@ApiOperation(value = "验证是否完善个人资料", tags = "用户接口",notes = "验证是否完善个人资料")
     public RestResponseBean queryById(@RequestParam(name="id",required=true) String id) {
 
         User user = userService.getById(id);
 
-        if(user==null) {
+		if (!StringUtils.isNotBlank(user.getChinaname()) || !StringUtils.isNotBlank(user.getEnglishname()) || !StringUtils.isNotBlank(user.getReferrer())) {
             return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
         }
 
@@ -181,11 +211,11 @@ public class RestUserController {
      * @return
      */
     @PostMapping(value = "/mobileLogin")
-    @ApiOperation(value = "手机验证码登录", tags = {"用户接口"}, notes = "手机验证码登录")
+  /*  @ApiOperation(value = "手机验证码登录", tags = {"用户接口"}, notes = "手机验证码登录")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String",defaultValue = "1",required = true),
             @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
-    })
+    })*/
     public RestResponseBean mobilelogin(@RequestBody @Valid SmsDTO smsDTO, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors() && org.apache.commons.lang3.StringUtils.isBlank(smsDTO.getCaptcha())) {
@@ -214,7 +244,7 @@ public class RestUserController {
      * @return
      */
     @PostMapping(value = "/edit")
-    @ApiOperation(value = "用户修改", tags = {"用户接口"}, notes = "用户修改")
+  //  @ApiOperation(value = "用户修改", tags = {"用户接口"}, notes = "用户修改")
     public RestResponseBean edit(@RequestBody User user) {
 
         User userEntity = userService.getById(user.getId());
@@ -270,7 +300,7 @@ public class RestUserController {
         return new RestResponseBean(ResultEnum.ERROR.getValue(),ResultEnum.ERROR.getDesc(),null);
     }
 
-    @PostMapping(value = "/updateUsername")
+  /*  @PostMapping(value = "/updateUsername")
     @ApiOperation(value = "修改用户名", tags = {"用户接口"}, notes = "修改用户名")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId",value = "用户的ID",dataType = "String",defaultValue = "1",required = true),
@@ -295,7 +325,7 @@ public class RestUserController {
 
         return new RestResponseBean(ResultEnum.ERROR.getValue(),ResultEnum.ERROR.getDesc(),null);
     }
-
+*/
     /**
      * 修改手机号
      * @param userId
@@ -461,15 +491,31 @@ public class RestUserController {
 
     @GetMapping(value = "isExistMobile")
     @ApiOperation(value = "手机号是否已被注册",tags = {"用户接口"},notes = "手机号是否已被注册")
-    public RestResponseBean isExistMobile(String mobile){
+    public RestResponseBean isExistMobile(@RequestParam  String mobile, @RequestParam Integer type){
 
         User user = userService.queryByMobile(mobile);
 
-        if(user == null){
-            return new RestResponseBean(ResultEnum.MOBILE_NOT_EXIST.getValue(),ResultEnum.MOBILE_NOT_EXIST.getDesc(),null);
-        }
+        if (type != null) {
+        	if (type == 0){
+				if(user == null){
+					return new RestResponseBean(ResultEnum.MOBILE_EXIST.getValue(),ResultEnum.MOBILE_EXIST.getDesc(),null);
+				} else {
+					return new RestResponseBean(ResultEnum.MOBILE_NOT_EXIST.getValue(),ResultEnum.MOBILE_NOT_EXIST.getDesc(),null);
+				}
+			} else{
+				if(user == null){
+					return new RestResponseBean(ResultEnum.MOBILE_NOT_EXIST.getValue(),ResultEnum.MOBILE_NOT_EXIST.getDesc(),null);
+				} else {
+					return new RestResponseBean(ResultEnum.MOBILE_EXIST.getValue(),ResultEnum.MOBILE_EXIST.getDesc(),null);
+				}
+			}
 
-        return new RestResponseBean(ResultEnum.MOBILE_EXIST.getValue(),ResultEnum.MOBILE_EXIST.getDesc(),null);
+		}else {
+			return new RestResponseBean(ResultEnum.MOBILE_EXIST.getValue(),ResultEnum.MOBILE_EXIST.getDesc(),"n");
+
+		}
+
+
     }
 
     /**
@@ -564,11 +610,11 @@ public class RestUserController {
      * @param mobile
      */
     @GetMapping(value = "/third")
-    @ApiOperation(value = "三方登录", tags = {"用户接口"}, notes = "三方登录")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "platform",value = "平台类型('1':QQ,'2':微信,'3':微博)",dataType = "String",defaultValue = "1",required = true),
-            @ApiImplicitParam(name = "mobile",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
-    })
+//    @ApiOperation(value = "三方登录", tags = {"用户接口"}, notes = "三方登录")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "platform",value = "平台类型('1':QQ,'2':微信,'3':微博)",dataType = "String",defaultValue = "1",required = true),
+//            @ApiImplicitParam(name = "mobile",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
+//    })
     public void third(@RequestParam String platform, @RequestParam String mobile, HttpServletResponse response){
 
         switch (platform){

@@ -11,7 +11,9 @@ import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.menu.SMSResultEnum;
 import org.benben.common.util.DateUtils;
+import org.benben.common.util.MobileVerify;
 import org.benben.common.util.RedisUtil;
+import org.benben.common.util.Sendsms;
 import org.benben.modules.business.commen.dto.SmsDTO;
 import org.benben.modules.business.commen.service.ISMSService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,21 @@ public class RestSmsController {
     @Autowired
     private ISMSService ismsService;
 
+
+
+    @PostMapping(value = "/ihuyi_send")
+	@ApiOperation(value = "使用互亿无线发送短信验证码",tags = "短信接口",notes = "使用互亿无线发送验证码")
+	public RestResponseBean ihuyiSend(@RequestParam String mobile){
+		if (mobile.equals("") || mobile == null) {
+			throw new RuntimeException("手机号为空");
+		}
+		if (!MobileVerify.isMobile(mobile)) {
+			throw new RuntimeException("请输入正确的手机号");
+		}
+		//发送短信
+		int phone = Sendsms.sendVerify(mobile);
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), phone);
+	}
 
     @PostMapping(value = "/third_send")
     @ApiOperation(value = "发送验证码 ",tags = {"短信接口"},notes = "发送验证码 ")

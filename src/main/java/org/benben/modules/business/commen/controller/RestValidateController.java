@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/v1/validate")
-@Api(tags = {"检测接口"})
+//@Api(tags = {"检测接口"})
 public class RestValidateController {
 
     @Autowired
@@ -27,7 +27,7 @@ public class RestValidateController {
     private IEmailServe emailServe;
 
     @GetMapping(value = "/check_email_available")
-    @ApiOperation(value = "检测邮箱",tags = {"检测接口"},notes = "检测邮箱")
+    //@ApiOperation(value = "检测邮箱",tags = {"检测接口"},notes = "检测邮箱")
     public RestResponseBean check_email_available(@RequestParam(name = "email")String email, @RequestParam(name="id")String id){
         String msg ="";
         int code = 0;
@@ -45,7 +45,7 @@ public class RestValidateController {
         return RestResponseBean;
     }
     @GetMapping("/check_email_exist")
-    @ApiOperation(value = "检测邮箱",tags = {"检测接口"},notes = "检测邮箱")
+   // @ApiOperation(value = "检测邮箱",tags = {"检测接口"},notes = "检测邮箱")
     public RestResponseBean check_email_exist(@RequestParam(name = "mobile")String email) {
         String msg = "";
         int code = 0;
@@ -56,7 +56,7 @@ public class RestValidateController {
         return RestResponseBean;
     }
     @GetMapping(value = "/check_username_available")
-    @ApiOperation(value = "检测用户名",tags = {"检测接口"},notes = "检测用户名")
+    //@ApiOperation(value = "检测用户名",tags = {"检测接口"},notes = "检测用户名")
     public RestResponseBean check_username_available(@RequestParam(name = "username")String username, @RequestParam(name="id")String id){
         String msg ="";
         int code = 0;
@@ -74,7 +74,7 @@ public class RestValidateController {
         return RestResponseBean;
     }
     @GetMapping(value = "/check_mobile_available")
-    @ApiOperation(value = "检测手机",tags = {"检测接口"},notes = "检测手机")
+   // @ApiOperation(value = "检测手机",tags = {"检测接口"},notes = "检测手机")
     public RestResponseBean check_mobile_available(@RequestParam(name = "mobile")String mobile, @RequestParam(name="id")String id){
         String msg ="";
         int code = 0;
@@ -93,7 +93,7 @@ public class RestValidateController {
     }
 
     @GetMapping("/check_mobile_exist")
-    @ApiOperation(value = "检测手机",tags = {"检测接口"},notes = "检测手机")
+    //@ApiOperation(value = "检测手机",tags = {"检测接口"},notes = "检测手机")
     public RestResponseBean check_mobile_exist(@RequestParam(name = "mobile")String mobile) {
         String msg = "";
         int code = 0;
@@ -104,7 +104,7 @@ public class RestValidateController {
         return RestResponseBean;
     }
     @GetMapping("/check_ems_correct")
-    @ApiOperation(value = "检测邮箱验证码",tags = {"检测接口"},notes = "检测邮箱验证码")
+//    @ApiOperation(value = "检测邮箱验证码",tags = {"检测接口"},notes = "检测邮箱验证码")
     public RestResponseBean check_ems_correct(@RequestParam(name = "email")String email, @RequestParam(name = "captcha")String captcha,
                                               @RequestParam(name = "event")String event) {
         Boolean aBoolean = validateService.captchaValidate(email,captcha,event);
@@ -129,7 +129,7 @@ public class RestValidateController {
 
 
     @GetMapping("/send")
-    @ApiOperation(value = "发送验证码",tags = {"检测接口"},notes = "发送验证码")
+//    @ApiOperation(value = "发送验证码",tags = {"检测接口"},notes = "发送验证码")
     public RestResponseBean offerCaptcha(@RequestParam(name = "email")String email, @RequestParam(name = "event")String event) {
         Boolean aBoolean = emailServe.offerCaptcha(email,event);
         if(aBoolean){
