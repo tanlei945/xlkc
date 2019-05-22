@@ -1,5 +1,6 @@
-package org.benben.modules.business.usermessage.controller;
+package org.benben.modules.business.books.controller;
 
+import java.awt.print.Book;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -9,23 +10,20 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.usermessage.entity.UserMessage;
-import org.benben.modules.business.usermessage.service.IUserMessageService;
+import org.benben.modules.business.books.entity.Books;
+import org.benben.modules.business.books.service.IBooksService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.benben.modules.business.usermessage.vo.UserMessageVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -41,61 +39,42 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 用户消息管理
+ * @Description: 书籍表
  * @author： jeecg-boot
- * @date：   2019-05-20
+ * @date：   2019-05-22
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/userMessage")
-@Api(tags = "我的消息")
+@RequestMapping("/api/v1/books")
 @Slf4j
-public class UserMessageController {
+public class RestBooksController {
 	@Autowired
-	private IUserMessageService userMessageService;
+	private IBooksService booksService;
 
-//	public RestResponseBean
-
-	 /**
-	  * 查询系统消息
-	  * @param state
-	  * @return
-	  */
-	@PostMapping("/queryByState")
-	@ApiOperation(value = "查询系统消息接口", tags = "我的消息", notes = "查询系统消息接口")
-	@ApiImplicitParam(name = "state",value = "消息状态 0/赞同的消息 1/评论的消息 2/普通消息")
-	public RestResponseBean queryByState(@RequestParam Integer state) {
-		if (state == null) {
-			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
-		}
-		if (state == 2 ) {
-			List<UserMessage> userMessages = userMessageService.queryByState(state);
-			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessages);
-		} else if(state == 0) {
-			List<UserMessageVo> userMessageVos = userMessageService.queryByLike(state);
-			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessageVos);
-		} else {
-			return null;
-		}
-
+	@GetMapping("/queryBooks")
+	@ApiOperation(value = "查询全部书籍", tags ="书店接口", notes = "查询全部书籍")
+	public RestResponseBean queryBooks() {
+		List<Books> books = booksService.queryBooks();
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),books);
 	}
+
 	/**
 	  * 分页列表查询
-	 * @param userMessage
+	 * @param books
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<UserMessage>> queryPageList(UserMessage userMessage,
+	public Result<IPage<Books>> queryPageList(Books books,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<UserMessage>> result = new Result<IPage<UserMessage>>();
-		QueryWrapper<UserMessage> queryWrapper = QueryGenerator.initQueryWrapper(userMessage, req.getParameterMap());
-		Page<UserMessage> page = new Page<UserMessage>(pageNo, pageSize);
-		IPage<UserMessage> pageList = userMessageService.page(page, queryWrapper);
+		Result<IPage<Books>> result = new Result<IPage<Books>>();
+		QueryWrapper<Books> queryWrapper = QueryGenerator.initQueryWrapper(books, req.getParameterMap());
+		Page<Books> page = new Page<Books>(pageNo, pageSize);
+		IPage<Books> pageList = booksService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -103,14 +82,15 @@ public class UserMessageController {
 	
 	/**
 	  *   添加
-	 * @param userMessage
+	 * @param books
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<UserMessage> add(@RequestBody UserMessage userMessage) {
-		Result<UserMessage> result = new Result<UserMessage>();
+	@ApiOperation(value = "添加数据接口", tags = "书店接口", notes = "添加数据接口")
+	public Result<Books> add(@RequestBody Books books) {
+		Result<Books> result = new Result<Books>();
 		try {
-			userMessageService.save(userMessage);
+			booksService.save(books);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -122,17 +102,17 @@ public class UserMessageController {
 	
 	/**
 	  *  编辑
-	 * @param userMessage
+	 * @param books
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<UserMessage> edit(@RequestBody UserMessage userMessage) {
-		Result<UserMessage> result = new Result<UserMessage>();
-		UserMessage userMessageEntity = userMessageService.getById(userMessage.getId());
-		if(userMessageEntity==null) {
+	public Result<Books> edit(@RequestBody Books books) {
+		Result<Books> result = new Result<Books>();
+		Books booksEntity = booksService.getById(books.getId());
+		if(booksEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = userMessageService.updateById(userMessage);
+			boolean ok = booksService.updateById(books);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -148,13 +128,13 @@ public class UserMessageController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<UserMessage> delete(@RequestParam(name="id",required=true) String id) {
-		Result<UserMessage> result = new Result<UserMessage>();
-		UserMessage userMessage = userMessageService.getById(id);
-		if(userMessage==null) {
+	public Result<Books> delete(@RequestParam(name="id",required=true) String id) {
+		Result<Books> result = new Result<Books>();
+		Books books = booksService.getById(id);
+		if(books==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = userMessageService.removeById(id);
+			boolean ok = booksService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -169,12 +149,12 @@ public class UserMessageController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<UserMessage> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<UserMessage> result = new Result<UserMessage>();
+	public Result<Books> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<Books> result = new Result<Books>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.userMessageService.removeByIds(Arrays.asList(ids.split(",")));
+			this.booksService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -186,13 +166,13 @@ public class UserMessageController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<UserMessage> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<UserMessage> result = new Result<UserMessage>();
-		UserMessage userMessage = userMessageService.getById(id);
-		if(userMessage==null) {
+	public Result<Books> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<Books> result = new Result<Books>();
+		Books books = booksService.getById(id);
+		if(books==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(userMessage);
+			result.setResult(books);
 			result.setSuccess(true);
 		}
 		return result;
@@ -207,13 +187,13 @@ public class UserMessageController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<UserMessage> queryWrapper = null;
+      QueryWrapper<Books> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              UserMessage userMessage = JSON.parseObject(deString, UserMessage.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(userMessage, request.getParameterMap());
+              Books books = JSON.parseObject(deString, Books.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(books, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -221,11 +201,11 @@ public class UserMessageController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<UserMessage> pageList = userMessageService.list(queryWrapper);
+      List<Books> pageList = booksService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "用户消息表列表");
-      mv.addObject(NormalExcelConstants.CLASS, UserMessage.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户消息表列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "书籍表列表");
+      mv.addObject(NormalExcelConstants.CLASS, Books.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("书籍表列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -248,11 +228,11 @@ public class UserMessageController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<UserMessage> listUserMessages = ExcelImportUtil.importExcel(file.getInputStream(), UserMessage.class, params);
-              for (UserMessage userMessageExcel : listUserMessages) {
-                  userMessageService.save(userMessageExcel);
+              List<Books> listBookss = ExcelImportUtil.importExcel(file.getInputStream(), Books.class, params);
+              for (Books booksExcel : listBookss) {
+                  booksService.save(booksExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listUserMessages.size());
+              return Result.ok("文件导入成功！数据行数：" + listBookss.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");
