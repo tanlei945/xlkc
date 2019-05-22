@@ -1,6 +1,7 @@
 package org.benben.modules.business.user.mapper;
 
 
+import org.apache.ibatis.annotations.Select;
 import org.benben.modules.business.user.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -12,4 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserMapper extends BaseMapper<User> {
 
+	@Select("SELECT * from `user` where chinaname = #{chinaname} and englishname = #{englishname} and referrer = #{referrer}")
+	User verifyUser(String chinaname, String englishname, String referrer);
 }

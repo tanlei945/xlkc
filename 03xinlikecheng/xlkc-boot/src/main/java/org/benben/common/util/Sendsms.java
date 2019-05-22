@@ -18,7 +18,7 @@ public class Sendsms {
 
 	private static String Url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit";
 
-	public static int sendVerify() {
+	public static int sendVerify(String mobile) {
 		HttpClient client = new HttpClient();
 		PostMethod method = new PostMethod(Url);
 
@@ -33,7 +33,7 @@ public class Sendsms {
 				new NameValuePair("account", "C39778784"), //查看用户名是登录用户中心->验证码短信->产品总览->APIID
 				new NameValuePair("password", "173df98383cbe10e223ee324d1e7cd89"),  //查看密码请登录用户中心->验证码短信->产品总览->APIKEY
 				//new NameValuePair("password", util.StringUtil.MD5Encode("密码")),
-				new NameValuePair("mobile", "18238579787"),
+				new NameValuePair("mobile", mobile),
 				new NameValuePair("content", content),
 		};
 		method.setRequestBody(data);

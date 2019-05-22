@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.ApiOperation;
 import org.benben.common.util.PasswordUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -74,7 +75,7 @@ public class UserController {
 	 * @param user
 	 * @return
 	 */
-	@PostMapping(value = "/add")
+/*	@PostMapping(value = "/add")
 	public Result<User> add(@RequestBody User user) {
 		Result<User> result = new Result<User>();
 		try {
@@ -91,13 +92,14 @@ public class UserController {
 		}
 		return result;
 	}
-	
+	*/
 	/**
 	  *  编辑
 	 * @param user
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
+//	@ApiOperation(value = "手机号已被注册",tags = {"用户接口"},notes = "手机号已被注册")
 	public Result<User> edit(@RequestBody User user) {
 		Result<User> result = new Result<User>();
 		User userEntity = userService.getById(user.getId());

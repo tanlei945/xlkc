@@ -3,6 +3,8 @@ package org.benben.modules.business.user.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.qq.connect.QQConnectException;
 import com.qq.connect.utils.QQConnectConfig;
+import org.benben.common.util.PasswordUtil;
+import org.benben.common.util.oConvertUtils;
 import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.user.entity.UserThird;
 import org.benben.modules.business.user.mapper.UserThirdMapper;
@@ -126,10 +128,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 		if(user == null){
 			return 0;
 		}
+		//随机得到盐
+		String salt = oConvertUtils.randomGen(8);
+		user.setSalt(salt);
+		String passwordEncode = PasswordUtil.encrypt(user.getMobile(), password, salt);
+		user.setPassword(passwordEncode);
+		return userMapper.updateById(user);
+	}
 
-		user.setPassword(password);
-
-		return userMapper.insert(user);
+	@Override
+	public User verifyUser(String chinaname, String englishname, String referrer) {
+		User user = userMapper.verifyUser(chinaname, englishname, referrer);
+		return user;
 	}
 
 

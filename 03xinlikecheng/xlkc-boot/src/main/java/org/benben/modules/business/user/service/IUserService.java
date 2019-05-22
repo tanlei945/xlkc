@@ -44,4 +44,5 @@ public interface IUserService extends IService<User> {
 
 	public int forgetPassword(String mobile, String password);
 
+	User verifyUser(String chinaname, String englishname, String referrer);
 }
