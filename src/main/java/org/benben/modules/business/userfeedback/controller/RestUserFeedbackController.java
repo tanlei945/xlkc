@@ -1,4 +1,4 @@
-package org.benben.modules.business.usercollect.controller;
+package org.benben.modules.business.userfeedback.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,24 +9,20 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
-import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.usercollect.entity.UserCollect;
-import org.benben.modules.business.usercollect.service.IUserCollectService;
+import org.benben.modules.business.userfeedback.entity.UserFeedback;
+import org.benben.modules.business.userfeedback.service.IUserFeedbackService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.benben.modules.business.usercollect.vo.UserCollectVo;
-import org.benben.modules.business.userposts.entity.Posts;
-import org.benben.modules.business.userposts.vo.UserPostsVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -42,50 +38,35 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 我的收藏表
+ * @Description: 用户反馈表
  * @author： jeecg-boot
  * @date：   2019-05-22
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/userCollect")
-@Api(tags = "收藏帖子接口")
+@RequestMapping("/api/v1/userFeedback")
 @Slf4j
-public class UserCollectController {
+public class RestUserFeedbackController {
 	@Autowired
-	private IUserCollectService userCollectService;
-
-	 @PostMapping("/queryByPostsid")
-	 @ApiOperation(value = "根据帖子id得到帖子的详细信息",tags = "收藏帖子接口",notes = "根据帖子id得到帖子的详细信息")
-	 public RestResponseBean queryByPostsid(@RequestParam String postsId) {
-		 Posts posts = userCollectService.queryByPostsId(postsId);
-		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),posts);
-	 }
-
-	 @GetMapping("/queryUserPosts")
-	 @ApiOperation(value = "展示所有收藏帖子", tags = "我的帖子接口", notes = "展示所有收藏帖子")
-	 public RestResponseBean queryUserPosts(){
-		 List<UserCollectVo> userCollects = userCollectService.queryUserPosts();
-		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userCollects);
-	 }
-
+	private IUserFeedbackService userFeedbackService;
+	
 	/**
 	  * 分页列表查询
-	 * @param userCollect
+	 * @param userFeedback
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<UserCollect>> queryPageList(UserCollect userCollect,
+	public Result<IPage<UserFeedback>> queryPageList(UserFeedback userFeedback,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<UserCollect>> result = new Result<IPage<UserCollect>>();
-		QueryWrapper<UserCollect> queryWrapper = QueryGenerator.initQueryWrapper(userCollect, req.getParameterMap());
-		Page<UserCollect> page = new Page<UserCollect>(pageNo, pageSize);
-		IPage<UserCollect> pageList = userCollectService.page(page, queryWrapper);
+		Result<IPage<UserFeedback>> result = new Result<IPage<UserFeedback>>();
+		QueryWrapper<UserFeedback> queryWrapper = QueryGenerator.initQueryWrapper(userFeedback, req.getParameterMap());
+		Page<UserFeedback> page = new Page<UserFeedback>(pageNo, pageSize);
+		IPage<UserFeedback> pageList = userFeedbackService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -93,15 +74,21 @@ public class UserCollectController {
 	
 	/**
 	  *   添加
-	 * @param userCollect
+	 * @param userFeedback
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "添加数据",tags = "收藏帖子接口",notes = "添加数据")
-	public Result<UserCollect> add(@RequestBody UserCollect userCollect) {
-		Result<UserCollect> result = new Result<UserCollect>();
+	@ApiOperation(value = "添加用户反馈数据", tags = "用户接口", notes = "添加用户反馈数据")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "userFeedback.uid", value = "用户相关联id"),
+			@ApiImplicitParam(name = "userFeedback.questionType", value = "问题类型  1下载/加载问题 2/付费问题 3/课程问题 4/体验问题"),
+			@ApiImplicitParam(name = "userFeedback.comment", value = "反馈描述"),
+			@ApiImplicitParam(name = "userFeedback.contact", value = "反馈图片"),
+	})
+	public Result<UserFeedback> add(@RequestBody UserFeedback userFeedback) {
+		Result<UserFeedback> result = new Result<UserFeedback>();
 		try {
-			userCollectService.save(userCollect);
+			userFeedbackService.save(userFeedback);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -113,17 +100,17 @@ public class UserCollectController {
 	
 	/**
 	  *  编辑
-	 * @param userCollect
+	 * @param userFeedback
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<UserCollect> edit(@RequestBody UserCollect userCollect) {
-		Result<UserCollect> result = new Result<UserCollect>();
-		UserCollect userCollectEntity = userCollectService.getById(userCollect.getId());
-		if(userCollectEntity==null) {
+	public Result<UserFeedback> edit(@RequestBody UserFeedback userFeedback) {
+		Result<UserFeedback> result = new Result<UserFeedback>();
+		UserFeedback userFeedbackEntity = userFeedbackService.getById(userFeedback.getId());
+		if(userFeedbackEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = userCollectService.updateById(userCollect);
+			boolean ok = userFeedbackService.updateById(userFeedback);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -139,13 +126,13 @@ public class UserCollectController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<UserCollect> delete(@RequestParam(name="id",required=true) String id) {
-		Result<UserCollect> result = new Result<UserCollect>();
-		UserCollect userCollect = userCollectService.getById(id);
-		if(userCollect==null) {
+	public Result<UserFeedback> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserFeedback> result = new Result<UserFeedback>();
+		UserFeedback userFeedback = userFeedbackService.getById(id);
+		if(userFeedback==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = userCollectService.removeById(id);
+			boolean ok = userFeedbackService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -160,12 +147,12 @@ public class UserCollectController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<UserCollect> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<UserCollect> result = new Result<UserCollect>();
+	public Result<UserFeedback> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserFeedback> result = new Result<UserFeedback>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.userCollectService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userFeedbackService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -177,13 +164,13 @@ public class UserCollectController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<UserCollect> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<UserCollect> result = new Result<UserCollect>();
-		UserCollect userCollect = userCollectService.getById(id);
-		if(userCollect==null) {
+	public Result<UserFeedback> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserFeedback> result = new Result<UserFeedback>();
+		UserFeedback userFeedback = userFeedbackService.getById(id);
+		if(userFeedback==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(userCollect);
+			result.setResult(userFeedback);
 			result.setSuccess(true);
 		}
 		return result;
@@ -198,13 +185,13 @@ public class UserCollectController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<UserCollect> queryWrapper = null;
+      QueryWrapper<UserFeedback> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              UserCollect userCollect = JSON.parseObject(deString, UserCollect.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(userCollect, request.getParameterMap());
+              UserFeedback userFeedback = JSON.parseObject(deString, UserFeedback.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userFeedback, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -212,11 +199,11 @@ public class UserCollectController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<UserCollect> pageList = userCollectService.list(queryWrapper);
+      List<UserFeedback> pageList = userFeedbackService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "我的收藏表列表");
-      mv.addObject(NormalExcelConstants.CLASS, UserCollect.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("我的收藏表列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户反馈表列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserFeedback.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户反馈表列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -239,11 +226,11 @@ public class UserCollectController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<UserCollect> listUserCollects = ExcelImportUtil.importExcel(file.getInputStream(), UserCollect.class, params);
-              for (UserCollect userCollectExcel : listUserCollects) {
-                  userCollectService.save(userCollectExcel);
+              List<UserFeedback> listUserFeedbacks = ExcelImportUtil.importExcel(file.getInputStream(), UserFeedback.class, params);
+              for (UserFeedback userFeedbackExcel : listUserFeedbacks) {
+                  userFeedbackService.save(userFeedbackExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listUserCollects.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserFeedbacks.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

@@ -1,4 +1,4 @@
-package org.benben.modules.business.userposts.controller;
+package org.benben.modules.business.usercollect.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,17 +8,25 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
+import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.userposts.entity.Posts;
-import org.benben.modules.business.userposts.service.IPostsService;
+import org.benben.modules.business.usercollect.entity.UserCollect;
+import org.benben.modules.business.usercollect.service.IUserCollectService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.benben.modules.business.usercollect.vo.UserCollectVo;
+import org.benben.modules.business.userposts.entity.Posts;
+import org.benben.modules.business.userposts.vo.UserPostsVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -34,35 +42,50 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 关于帖子
+ * @Description: 我的收藏表
  * @author： jeecg-boot
  * @date：   2019-05-22
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/userposts/posts")
+@RequestMapping("/api/v1/userCollect")
+@Api(tags = "收藏帖子接口")
 @Slf4j
-public class PostsController {
+public class RestUserCollectController {
 	@Autowired
-	private IPostsService postsService;
-	
+	private IUserCollectService userCollectService;
+
+	 @PostMapping("/queryByPostsid")
+	 @ApiOperation(value = "根据帖子id得到帖子的详细信息",tags = "收藏帖子接口",notes = "根据帖子id得到帖子的详细信息")
+	 public RestResponseBean queryByPostsid(@RequestParam String postsId) {
+		 Posts posts = userCollectService.queryByPostsId(postsId);
+		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),posts);
+	 }
+
+	 @GetMapping("/queryUserPosts")
+	 @ApiOperation(value = "展示所有收藏帖子", tags = "我的帖子接口", notes = "展示所有收藏帖子")
+	 public RestResponseBean queryUserPosts(){
+		 List<UserCollectVo> userCollects = userCollectService.queryUserPosts();
+		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userCollects);
+	 }
+
 	/**
 	  * 分页列表查询
-	 * @param posts
+	 * @param userCollect
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Posts>> queryPageList(Posts posts,
+	public Result<IPage<UserCollect>> queryPageList(UserCollect userCollect,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Posts>> result = new Result<IPage<Posts>>();
-		QueryWrapper<Posts> queryWrapper = QueryGenerator.initQueryWrapper(posts, req.getParameterMap());
-		Page<Posts> page = new Page<Posts>(pageNo, pageSize);
-		IPage<Posts> pageList = postsService.page(page, queryWrapper);
+		Result<IPage<UserCollect>> result = new Result<IPage<UserCollect>>();
+		QueryWrapper<UserCollect> queryWrapper = QueryGenerator.initQueryWrapper(userCollect, req.getParameterMap());
+		Page<UserCollect> page = new Page<UserCollect>(pageNo, pageSize);
+		IPage<UserCollect> pageList = userCollectService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -70,14 +93,15 @@ public class PostsController {
 	
 	/**
 	  *   添加
-	 * @param posts
+	 * @param userCollect
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<Posts> add(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
+	@ApiOperation(value = "添加数据",tags = "收藏帖子接口",notes = "添加数据")
+	public Result<UserCollect> add(@RequestBody UserCollect userCollect) {
+		Result<UserCollect> result = new Result<UserCollect>();
 		try {
-			postsService.save(posts);
+			userCollectService.save(userCollect);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,17 +113,17 @@ public class PostsController {
 	
 	/**
 	  *  编辑
-	 * @param posts
+	 * @param userCollect
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Posts> edit(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
-		Posts postsEntity = postsService.getById(posts.getId());
-		if(postsEntity==null) {
+	public Result<UserCollect> edit(@RequestBody UserCollect userCollect) {
+		Result<UserCollect> result = new Result<UserCollect>();
+		UserCollect userCollectEntity = userCollectService.getById(userCollect.getId());
+		if(userCollectEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.updateById(posts);
+			boolean ok = userCollectService.updateById(userCollect);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -115,13 +139,13 @@ public class PostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Posts> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserCollect> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserCollect> result = new Result<UserCollect>();
+		UserCollect userCollect = userCollectService.getById(id);
+		if(userCollect==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.removeById(id);
+			boolean ok = userCollectService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -136,12 +160,12 @@ public class PostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Posts> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Posts> result = new Result<Posts>();
+	public Result<UserCollect> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserCollect> result = new Result<UserCollect>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.postsService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userCollectService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -153,13 +177,13 @@ public class PostsController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<Posts> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserCollect> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserCollect> result = new Result<UserCollect>();
+		UserCollect userCollect = userCollectService.getById(id);
+		if(userCollect==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(posts);
+			result.setResult(userCollect);
 			result.setSuccess(true);
 		}
 		return result;
@@ -174,13 +198,13 @@ public class PostsController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Posts> queryWrapper = null;
+      QueryWrapper<UserCollect> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Posts posts = JSON.parseObject(deString, Posts.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(posts, request.getParameterMap());
+              UserCollect userCollect = JSON.parseObject(deString, UserCollect.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userCollect, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -188,11 +212,11 @@ public class PostsController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Posts> pageList = postsService.list(queryWrapper);
+      List<UserCollect> pageList = userCollectService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "关于帖子列表");
-      mv.addObject(NormalExcelConstants.CLASS, Posts.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("关于帖子列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "我的收藏表列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserCollect.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("我的收藏表列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -215,11 +239,11 @@ public class PostsController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Posts> listPostss = ExcelImportUtil.importExcel(file.getInputStream(), Posts.class, params);
-              for (Posts postsExcel : listPostss) {
-                  postsService.save(postsExcel);
+              List<UserCollect> listUserCollects = ExcelImportUtil.importExcel(file.getInputStream(), UserCollect.class, params);
+              for (UserCollect userCollectExcel : listUserCollects) {
+                  userCollectService.save(userCollectExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listPostss.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserCollects.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

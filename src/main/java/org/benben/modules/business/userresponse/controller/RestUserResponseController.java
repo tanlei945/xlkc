@@ -1,6 +1,5 @@
-package org.benben.modules.business.books.controller;
+package org.benben.modules.business.userresponse.controller;
 
-import java.awt.print.Book;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.ApiOperation;
-import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
-import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.books.entity.Books;
-import org.benben.modules.business.books.service.IBooksService;
+import org.benben.modules.business.userresponse.entity.UserResponse;
+import org.benben.modules.business.userresponse.service.IUserResponseService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,42 +36,35 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 书籍表
+ * @Description: 用户反馈表管理
  * @author： jeecg-boot
  * @date：   2019-05-22
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/books")
+@RequestMapping("/userresponse/userResponse")
 @Slf4j
-public class BooksController {
+public class RestUserResponseController {
 	@Autowired
-	private IBooksService booksService;
-
-	@GetMapping("/queryBooks")
-	@ApiOperation(value = "查询全部书籍", tags ="书店接口", notes = "查询全部书籍")
-	public RestResponseBean queryBooks() {
-		List<Books> books = booksService.queryBooks();
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),books);
-	}
-
+	private IUserResponseService userResponseService;
+	
 	/**
 	  * 分页列表查询
-	 * @param books
+	 * @param userResponse
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Books>> queryPageList(Books books,
+	public Result<IPage<UserResponse>> queryPageList(UserResponse userResponse,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Books>> result = new Result<IPage<Books>>();
-		QueryWrapper<Books> queryWrapper = QueryGenerator.initQueryWrapper(books, req.getParameterMap());
-		Page<Books> page = new Page<Books>(pageNo, pageSize);
-		IPage<Books> pageList = booksService.page(page, queryWrapper);
+		Result<IPage<UserResponse>> result = new Result<IPage<UserResponse>>();
+		QueryWrapper<UserResponse> queryWrapper = QueryGenerator.initQueryWrapper(userResponse, req.getParameterMap());
+		Page<UserResponse> page = new Page<UserResponse>(pageNo, pageSize);
+		IPage<UserResponse> pageList = userResponseService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -82,15 +72,14 @@ public class BooksController {
 	
 	/**
 	  *   添加
-	 * @param books
+	 * @param userResponse
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "添加数据接口", tags = "书店接口", notes = "添加数据接口")
-	public Result<Books> add(@RequestBody Books books) {
-		Result<Books> result = new Result<Books>();
+	public Result<UserResponse> add(@RequestBody UserResponse userResponse) {
+		Result<UserResponse> result = new Result<UserResponse>();
 		try {
-			booksService.save(books);
+			userResponseService.save(userResponse);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,17 +91,17 @@ public class BooksController {
 	
 	/**
 	  *  编辑
-	 * @param books
+	 * @param userResponse
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Books> edit(@RequestBody Books books) {
-		Result<Books> result = new Result<Books>();
-		Books booksEntity = booksService.getById(books.getId());
-		if(booksEntity==null) {
+	public Result<UserResponse> edit(@RequestBody UserResponse userResponse) {
+		Result<UserResponse> result = new Result<UserResponse>();
+		UserResponse userResponseEntity = userResponseService.getById(userResponse.getId());
+		if(userResponseEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = booksService.updateById(books);
+			boolean ok = userResponseService.updateById(userResponse);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -128,13 +117,13 @@ public class BooksController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Books> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Books> result = new Result<Books>();
-		Books books = booksService.getById(id);
-		if(books==null) {
+	public Result<UserResponse> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserResponse> result = new Result<UserResponse>();
+		UserResponse userResponse = userResponseService.getById(id);
+		if(userResponse==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = booksService.removeById(id);
+			boolean ok = userResponseService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -149,12 +138,12 @@ public class BooksController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Books> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Books> result = new Result<Books>();
+	public Result<UserResponse> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserResponse> result = new Result<UserResponse>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.booksService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userResponseService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -166,13 +155,13 @@ public class BooksController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<Books> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Books> result = new Result<Books>();
-		Books books = booksService.getById(id);
-		if(books==null) {
+	public Result<UserResponse> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserResponse> result = new Result<UserResponse>();
+		UserResponse userResponse = userResponseService.getById(id);
+		if(userResponse==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(books);
+			result.setResult(userResponse);
 			result.setSuccess(true);
 		}
 		return result;
@@ -187,13 +176,13 @@ public class BooksController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Books> queryWrapper = null;
+      QueryWrapper<UserResponse> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Books books = JSON.parseObject(deString, Books.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(books, request.getParameterMap());
+              UserResponse userResponse = JSON.parseObject(deString, UserResponse.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userResponse, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -201,11 +190,11 @@ public class BooksController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Books> pageList = booksService.list(queryWrapper);
+      List<UserResponse> pageList = userResponseService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "书籍表列表");
-      mv.addObject(NormalExcelConstants.CLASS, Books.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("书籍表列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户反馈表管理列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserResponse.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户反馈表管理列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -228,11 +217,11 @@ public class BooksController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Books> listBookss = ExcelImportUtil.importExcel(file.getInputStream(), Books.class, params);
-              for (Books booksExcel : listBookss) {
-                  booksService.save(booksExcel);
+              List<UserResponse> listUserResponses = ExcelImportUtil.importExcel(file.getInputStream(), UserResponse.class, params);
+              for (UserResponse userResponseExcel : listUserResponses) {
+                  userResponseService.save(userResponseExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listBookss.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserResponses.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

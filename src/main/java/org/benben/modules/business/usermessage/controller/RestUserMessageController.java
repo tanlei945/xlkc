@@ -1,4 +1,4 @@
-package org.benben.modules.business.homework.controller;
+package org.benben.modules.business.usermessage.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,21 +10,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.homework.entity.Homework;
-import org.benben.modules.business.homework.service.ICourseService;
-import org.benben.modules.business.homework.service.IHomeworkService;
+import org.benben.modules.business.usermessage.entity.UserMessage;
+import org.benben.modules.business.usermessage.service.IUserMessageService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.benben.modules.business.usermessage.vo.UserMessageVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -32,81 +33,69 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
-import org.w3c.dom.ls.LSInput;
 
-/**
+ /**
  * @Title: Controller
- * @Description: 我的功课管理
+ * @Description: 用户消息管理
  * @author： jeecg-boot
- * @date：   2019-05-18
+ * @date：   2019-05-20
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/homework")
-@Api(tags = "我的功课")
+@RequestMapping("/api/v1/userMessage")
+@Api(tags = "我的消息")
 @Slf4j
-public class HomeworkController {
+public class RestUserMessageController {
 	@Autowired
-	private IHomeworkService homeworkService;
+	private IUserMessageService userMessageService;
 
-	@Autowired
-	private ICourseService courseService;
+//	public RestResponseBean
 
 	 /**
-	  * 查询完成功课的课程信息名称
-	  * @param courseId
-	  * @param achieve
+	  * 查询系统消息
+	  * @param state
 	  * @return
 	  */
-	@PostMapping("/queryByCourseIdAndAchieve")
-	@ApiOperation(value = "查询完成功课的信息名称", tags = "我的功课", notes = "查询完成功课的信息名称")
-	public RestResponseBean queryByCourseIdAndAchieve(@RequestParam String courseId, @RequestParam Integer achieve){
-		if (courseId == null || achieve ==null) {
+	@PostMapping("/queryByState")
+	@ApiOperation(value = "查询系统消息接口", tags = "我的消息", notes = "查询系统消息接口")
+	@ApiImplicitParam(name = "state",value = "消息状态 0/赞同的消息 1/评论的消息 2/普通消息")
+	public RestResponseBean queryByState(@RequestParam Integer state) {
+		if (state == null) {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
-		String courseName = courseService.queryByCourseIdAndAchieve(courseId, achieve);
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),courseName);
-	}
-
-	 /**
-	  * 根据用户id和课程id查询我的全部功课
-	  * @param uid
-	  * @param courseId
-	  * @return
-	  */
-	 @PostMapping(value = "/queryByUidAndCourseId")
-	 @ApiOperation(value = "查询全部功课信息",tags = "我的功课", notes = "查询全部功课信息")
-	public RestResponseBean queryHomework(@RequestParam String uid, @RequestParam String courseId){
-		if (uid == null || courseId == null){
-			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
+		if (state == 2 ) {
+			List<UserMessage> userMessages = userMessageService.queryByState(state);
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessages);
+		} else if(state == 0) {
+			List<UserMessageVo> userMessageVos = userMessageService.queryByLike(state);
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessageVos);
+		} else {
+			return null;
 		}
-		 Homework homework = homeworkService.queryByUidAndCourseId(uid, courseId);
-		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), homework);
-	}
 
+	}
 	/**
 	  * 分页列表查询
-	 * @param homework
+	 * @param userMessage
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Homework>> queryPageList(Homework homework,
+	public Result<IPage<UserMessage>> queryPageList(UserMessage userMessage,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Homework>> result = new Result<IPage<Homework>>();
-		QueryWrapper<Homework> queryWrapper = QueryGenerator.initQueryWrapper(homework, req.getParameterMap());
-		Page<Homework> page = new Page<Homework>(pageNo, pageSize);
-		IPage<Homework> pageList = homeworkService.page(page, queryWrapper);
+		Result<IPage<UserMessage>> result = new Result<IPage<UserMessage>>();
+		QueryWrapper<UserMessage> queryWrapper = QueryGenerator.initQueryWrapper(userMessage, req.getParameterMap());
+		Page<UserMessage> page = new Page<UserMessage>(pageNo, pageSize);
+		IPage<UserMessage> pageList = userMessageService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -114,14 +103,14 @@ public class HomeworkController {
 	
 	/**
 	  *   添加
-	 * @param homework
+	 * @param userMessage
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<Homework> add(@RequestBody Homework homework) {
-		Result<Homework> result = new Result<Homework>();
+	public Result<UserMessage> add(@RequestBody UserMessage userMessage) {
+		Result<UserMessage> result = new Result<UserMessage>();
 		try {
-			homeworkService.save(homework);
+			userMessageService.save(userMessage);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,17 +122,17 @@ public class HomeworkController {
 	
 	/**
 	  *  编辑
-	 * @param homework
+	 * @param userMessage
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Homework> edit(@RequestBody Homework homework) {
-		Result<Homework> result = new Result<Homework>();
-		Homework homeworkEntity = homeworkService.getById(homework.getId());
-		if(homeworkEntity==null) {
+	public Result<UserMessage> edit(@RequestBody UserMessage userMessage) {
+		Result<UserMessage> result = new Result<UserMessage>();
+		UserMessage userMessageEntity = userMessageService.getById(userMessage.getId());
+		if(userMessageEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = homeworkService.updateById(homework);
+			boolean ok = userMessageService.updateById(userMessage);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -159,13 +148,13 @@ public class HomeworkController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Homework> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Homework> result = new Result<Homework>();
-		Homework homework = homeworkService.getById(id);
-		if(homework==null) {
+	public Result<UserMessage> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserMessage> result = new Result<UserMessage>();
+		UserMessage userMessage = userMessageService.getById(id);
+		if(userMessage==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = homeworkService.removeById(id);
+			boolean ok = userMessageService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -180,12 +169,12 @@ public class HomeworkController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Homework> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Homework> result = new Result<Homework>();
+	public Result<UserMessage> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserMessage> result = new Result<UserMessage>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.homeworkService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userMessageService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -197,14 +186,13 @@ public class HomeworkController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	@ApiOperation(value = "根据id查询功课的详细信息", tags = "我的功课", notes = "根据id查询功课的详细信息")
-	public Result<Homework> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Homework> result = new Result<Homework>();
-		Homework homework = homeworkService.getById(id);
-		if(homework==null) {
+	public Result<UserMessage> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserMessage> result = new Result<UserMessage>();
+		UserMessage userMessage = userMessageService.getById(id);
+		if(userMessage==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(homework);
+			result.setResult(userMessage);
 			result.setSuccess(true);
 		}
 		return result;
@@ -219,13 +207,13 @@ public class HomeworkController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Homework> queryWrapper = null;
+      QueryWrapper<UserMessage> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Homework homework = JSON.parseObject(deString, Homework.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(homework, request.getParameterMap());
+              UserMessage userMessage = JSON.parseObject(deString, UserMessage.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userMessage, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -233,11 +221,11 @@ public class HomeworkController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Homework> pageList = homeworkService.list(queryWrapper);
+      List<UserMessage> pageList = userMessageService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "我的功课管理列表");
-      mv.addObject(NormalExcelConstants.CLASS, Homework.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("我的功课管理列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户消息表列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserMessage.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户消息表列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -260,11 +248,11 @@ public class HomeworkController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Homework> listHomeworks = ExcelImportUtil.importExcel(file.getInputStream(), Homework.class, params);
-              for (Homework homeworkExcel : listHomeworks) {
-                  homeworkService.save(homeworkExcel);
+              List<UserMessage> listUserMessages = ExcelImportUtil.importExcel(file.getInputStream(), UserMessage.class, params);
+              for (UserMessage userMessageExcel : listUserMessages) {
+                  userMessageService.save(userMessageExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listHomeworks.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserMessages.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");
