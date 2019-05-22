@@ -42,7 +42,7 @@ import com.alibaba.fastjson.JSON;
 @RestController
 @RequestMapping("/api/v1/course")
 @Slf4j
-public class CourseController {
+public class RestCourseController {
 	@Autowired
 	private ICourseService courseService;
 	
