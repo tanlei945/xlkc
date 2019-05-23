@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 我的功课管理
+ * @Description: 管理功课
  * @author： jeecg-boot
- * @date：   2019-05-18
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Data
@@ -23,13 +23,13 @@ public class Homework implements Serializable {
     
 	/**ID*/
 	@TableId(type = IdType.UUID)
-	private java.lang.Integer id;
+	private java.lang.String id;
+	/**userId*/
+	@Excel(name = "userId", width = 15)
+	private java.lang.String userId;
 	/**课程相关联id*/
 	@Excel(name = "课程相关联id", width = 15)
 	private java.lang.String courseId;
-	/**用户相关联id*/
-	@Excel(name = "课程相关联id", width = 15)
-	private java.lang.String userId;
 	/**小组名称*/
 	@Excel(name = "小组名称", width = 15)
 	private java.lang.String groupName;
@@ -67,7 +67,7 @@ public class Homework implements Serializable {
 	private java.util.Date createTime;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
-	private java.lang.Integer createBy;
+	private java.lang.String createBy;
 	/**修改时间*/
 	@Excel(name = "修改时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
@@ -75,5 +75,5 @@ public class Homework implements Serializable {
 	private java.util.Date updateTime;
 	/**修改人*/
 	@Excel(name = "修改人", width = 15)
-	private java.lang.Integer updateBy;
+	private java.lang.String updateBy;
 }

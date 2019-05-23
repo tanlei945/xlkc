@@ -7,17 +7,22 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
+            <a-form-item label="userId">
+              <a-input placeholder="请输入userId" v-model="queryParam.userId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="课程相关联id">
               <a-input placeholder="请输入课程相关联id" v-model="queryParam.courseId"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
+        <template v-if="toggleSearchStatus">
+        <a-col :md="6" :sm="8">
             <a-form-item label="小组名称">
               <a-input placeholder="请输入小组名称" v-model="queryParam.groupName"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
-        <a-col :md="6" :sm="8">
+          <a-col :md="6" :sm="8">
             <a-form-item label="组员">
               <a-input placeholder="请输入组员" v-model="queryParam.crew"></a-input>
             </a-form-item>
@@ -25,11 +30,6 @@
           <a-col :md="6" :sm="8">
             <a-form-item label="文档路径">
               <a-input placeholder="请输入文档路径" v-model="queryParam.wordUrl"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="文档名称">
-              <a-input placeholder="请输入文档名称" v-model="queryParam.wordName"></a-input>
             </a-form-item>
           </a-col>
         </template>
@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '我的功课管理管理页面',
+        description: '管理功课管理页面',
         // 表头
         columns: [
           {
@@ -131,6 +131,11 @@
             customRender:function (t,r,index) {
               return parseInt(index)+1;
             }
+           },
+		   {
+            title: 'userId',
+            align:"center",
+            dataIndex: 'userId'
            },
 		   {
             title: '课程相关联id',
