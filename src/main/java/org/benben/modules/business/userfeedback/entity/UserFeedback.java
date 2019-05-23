@@ -13,7 +13,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 /**
  * @Description: 用户反馈表
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Data
@@ -27,8 +27,8 @@ public class UserFeedback implements Serializable {
 	/**用户相关联id*/
 	@Excel(name = "用户相关联id", width = 15)
 	private java.lang.String uid;
-	/**问题类型*/
-	@Excel(name = "问题类型", width = 15)
+	/**问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题*/
+	@Excel(name = "问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题", width = 15)
 	private java.lang.String questionType;
 	/**反馈描述*/
 	@Excel(name = "反馈描述", width = 15)

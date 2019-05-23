@@ -20,8 +20,8 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="问题类型">
-          <a-input placeholder="请输入问题类型" v-decorator="['questionType', {}]" />
+          label="问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题">
+          <a-input placeholder="请输入问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题" v-decorator="['questionType', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
