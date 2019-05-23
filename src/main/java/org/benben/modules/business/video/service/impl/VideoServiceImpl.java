@@ -5,14 +5,15 @@ import org.benben.modules.business.video.mapper.VideoMapper;
 import org.benben.modules.business.video.service.IVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.util.List;
 
 /**
- * @Description: 学习园地视频管理
+ * @Description: 对视频的管理
  * @author： jeecg-boot
- * @date：   2019-05-20
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Service

@@ -14,6 +14,12 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
+          label="state">
+          <a-input-number v-decorator="[ 'state', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
           label="视频名称">
           <a-input placeholder="请输入视频名称" v-decorator="['name', {}]" />
         </a-form-item>
@@ -91,7 +97,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'name','videoUrl','videoType','videoClass','invitecode'))
+          this.form.setFieldsValue(pick(this.model,'state','name','videoUrl','videoType','videoClass','invitecode'))
 		  //时间格式化
         });
 
