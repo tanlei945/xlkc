@@ -8,9 +8,9 @@ import org.benben.modules.business.userposts.vo.UserPostsVo;
 import java.util.List;
 
 /**
- * @Description: 我的帖子表
+ * @Description: 用户帖子管理
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-05-23
  * @version： V1.0
  */
 public interface IUserPostsService extends IService<UserPosts> {

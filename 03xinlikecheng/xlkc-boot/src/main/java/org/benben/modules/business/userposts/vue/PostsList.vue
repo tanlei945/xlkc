@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '关于帖子管理页面',
+        description: '帖子表的管理管理页面',
         // 表头
         columns: [
           {
