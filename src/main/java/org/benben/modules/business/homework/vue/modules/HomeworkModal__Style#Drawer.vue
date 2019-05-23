@@ -14,20 +14,26 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
+          label="userId">
+          <a-input placeholder="请输入userId" v-decorator="['userId', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
           label="课程相关联id">
-          <a-input-number v-decorator="[ 'courseId', validatorRules.courseId ]" />
+          <a-input placeholder="请输入课程相关联id" v-decorator="['courseId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="小组名称">
-          <a-input placeholder="请输入小组名称" v-decorator="['groupName', validatorRules.groupName ]" />
+          <a-input placeholder="请输入小组名称" v-decorator="['groupName', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="组员">
-          <a-input placeholder="请输入组员" v-decorator="['crew', validatorRules.crew ]" />
+          <a-input placeholder="请输入组员" v-decorator="['crew', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -109,9 +115,6 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        courseId:{rules: [{ required: true, message: '请输入课程相关联id!' }]},
-        groupName:{rules: [{ required: true, message: '请输入小组名称!' }]},
-        crew:{rules: [{ required: true, message: '请输入组员!' }]},
         },
         url: {
           add: "/homework/homework/add",
@@ -130,7 +133,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'courseId','groupName','crew','wordUrl','wordName','pictureUrl','pictureName','voiceUrl','voiceName','videoUrl','videoName'))
+          this.form.setFieldsValue(pick(this.model,'userId','courseId','groupName','crew','wordUrl','wordName','pictureUrl','pictureName','voiceUrl','voiceName','videoUrl','videoName'))
 		  //时间格式化
         });
 
