@@ -98,7 +98,7 @@
     },
     data () {
       return {
-        description: '我的收藏表管理页面',
+        description: '用户收藏表管理管理页面',
         // 表头
         columns: [
           {
