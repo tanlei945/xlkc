@@ -12,8 +12,8 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="问题类型">
-              <a-input placeholder="请输入问题类型" v-model="queryParam.questionType"></a-input>
+            <a-form-item label="问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题">
+              <a-input placeholder="请输入问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题" v-model="queryParam.questionType"></a-input>
             </a-form-item>
           </a-col>
         <template v-if="toggleSearchStatus">
@@ -138,7 +138,7 @@
             dataIndex: 'uid'
            },
 		   {
-            title: '问题类型',
+            title: '问题类型 1下载/加载问题 2/付费问题 3/课程问题 4/体验问题',
             align:"center",
             dataIndex: 'questionType'
            },

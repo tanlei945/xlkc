@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 /**
  * @Description: 用户反馈表
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-05-23
  * @version： V1.0
  */
 public interface UserFeedbackMapper extends BaseMapper<UserFeedback> {
