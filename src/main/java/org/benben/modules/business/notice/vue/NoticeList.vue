@@ -98,7 +98,7 @@
     },
     data () {
       return {
-        description: '通知表管理管理页面',
+        description: '关于通知的管理管理页面',
         // 表头
         columns: [
           {
