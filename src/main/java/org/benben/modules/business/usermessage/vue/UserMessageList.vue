@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '用户消息表管理页面',
+        description: '用户消息管理管理页面',
         // 表头
         columns: [
           {
