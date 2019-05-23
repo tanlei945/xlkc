@@ -12,9 +12,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.util.List;
 
 /**
- * @Description: 用户消息表
+ * @Description: 用户消息管理
  * @author： jeecg-boot
- * @date：   2019-05-20
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Service
