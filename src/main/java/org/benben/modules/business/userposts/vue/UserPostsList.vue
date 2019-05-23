@@ -103,7 +103,7 @@
     },
     data () {
       return {
-        description: '我的帖子表管理页面',
+        description: '用户帖子管理管理页面',
         // 表头
         columns: [
           {

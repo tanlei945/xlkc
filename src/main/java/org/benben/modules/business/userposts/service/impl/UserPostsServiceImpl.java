@@ -1,6 +1,5 @@
 package org.benben.modules.business.userposts.service.impl;
 
-import javafx.geometry.Pos;
 import org.benben.modules.business.userposts.entity.Posts;
 import org.benben.modules.business.userposts.entity.UserPosts;
 import org.benben.modules.business.userposts.mapper.UserPostsMapper;
@@ -14,9 +13,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.util.List;
 
 /**
- * @Description: 我的帖子表
+ * @Description: 用户帖子管理
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Service

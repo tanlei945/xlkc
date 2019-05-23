@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 关于帖子
+ * @Description: 帖子表的管理
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Data
