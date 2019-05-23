@@ -7,17 +7,22 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
+            <a-form-item label="state">
+              <a-input placeholder="请输入state" v-model="queryParam.state"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="视频名称">
               <a-input placeholder="请输入视频名称" v-model="queryParam.name"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
+        <template v-if="toggleSearchStatus">
+        <a-col :md="6" :sm="8">
             <a-form-item label="视频地址">
               <a-input placeholder="请输入视频地址" v-model="queryParam.videoUrl"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
-        <a-col :md="6" :sm="8">
+          <a-col :md="6" :sm="8">
             <a-form-item label="视频类型">
               <a-input placeholder="请输入视频类型" v-model="queryParam.videoType"></a-input>
             </a-form-item>
@@ -25,11 +30,6 @@
           <a-col :md="6" :sm="8">
             <a-form-item label="视频 1/收费视频 0/ 免费视频">
               <a-input placeholder="请输入视频 1/收费视频 0/ 免费视频" v-model="queryParam.videoClass"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="邀请码">
-              <a-input placeholder="请输入邀请码" v-model="queryParam.invitecode"></a-input>
             </a-form-item>
           </a-col>
         </template>
@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '学习园地视频管理管理页面',
+        description: '对视频的管理管理页面',
         // 表头
         columns: [
           {
@@ -131,6 +131,11 @@
             customRender:function (t,r,index) {
               return parseInt(index)+1;
             }
+           },
+		   {
+            title: 'state',
+            align:"center",
+            dataIndex: 'state'
            },
 		   {
             title: '视频名称',

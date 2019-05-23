@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 学习园地视频管理
+ * @Description: 对视频的管理
  * @author： jeecg-boot
- * @date：   2019-05-20
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Data
@@ -24,7 +24,8 @@ public class Video implements Serializable {
 	/**主键ID*/
 	@TableId(type = IdType.UUID)
 	private java.lang.String id;
-	@Excel(name = "状态 0/没有输入邀请码 1/已经输入过邀请码")
+	/**state*/
+	@Excel(name = "state", width = 15)
 	private java.lang.Integer state;
 	/**视频名称*/
 	@Excel(name = "视频名称", width = 15)
@@ -57,17 +58,4 @@ public class Video implements Serializable {
 	/**修改*/
 	@Excel(name = "修改", width = 15)
 	private java.lang.String updateBy;
-
-	public Video(){
-
-	}
-	public Video(String name, String videoUrl, String videoType, Integer videoClass, String invitecode) {
-		this.name = name;
-		this.videoUrl = videoUrl;
-		this.videoType = videoType;
-		this.videoClass = videoClass;
-		this.invitecode = invitecode;
-	}
-
-
 }

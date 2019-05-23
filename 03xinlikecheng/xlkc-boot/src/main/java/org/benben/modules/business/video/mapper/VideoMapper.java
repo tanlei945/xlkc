@@ -9,9 +9,9 @@ import org.benben.modules.business.video.entity.Video;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
- * @Description: 学习园地视频管理
+ * @Description: 对视频的管理
  * @author： jeecg-boot
- * @date：   2019-05-20
+ * @date：   2019-05-23
  * @version： V1.0
  */
 public interface VideoMapper extends BaseMapper<Video> {
