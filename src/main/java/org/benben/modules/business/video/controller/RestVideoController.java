@@ -28,6 +28,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.benben.modules.business.video.vo.VideoVo;
+import org.benben.modules.business.video.vo.VideosVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -61,7 +63,7 @@ public class RestVideoController {
 	 @ApiOperation(value = "已经输入过邀请码视频接口", tags = "学习园地接口", notes = "已经输入过邀请码视频接口")
 	 public RestResponseBean queryVideo() {
 
-		 List<Video> videos = videoService.queryVideo();
+		 List<VideoVo> videos = videoService.queryVideo();
 		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
 	 }
 
@@ -75,17 +77,27 @@ public class RestVideoController {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
 		 List<Video> videos = videoService.queryByTypeAndInvitecode(invitecode);
+		if (videos == null) {
+			return new RestResponseBean(ResultEnum.VERIFY_FAIL.getValue(),ResultEnum.VERIFY_FAIL.getDesc(),"邀请码不存在");
+		}
 		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
+	 }
+
+	 @PostMapping("/videoByVideotype")
+	 @ApiOperation(value = "根据类型得到视频接口", tags = "学习园地接口", notes = "根据类型得到视频接口")
+	 public  RestResponseBean queryByVideotype(@RequestParam String parentId) {
+	 	List<Video> videos = videoService.queryByVidoetype(parentId);
+	 	return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
 	 }
 
 	@PostMapping("/videoClassify")
 	@ApiOperation(value = "免费视频接口", tags = "学习园地接口", notes = "免费视频接口")
-	public RestResponseBean query() {
+	public RestResponseBean query(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
 		/*if (type == null) {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}*/
-		List<Video> videos = videoService.queryByType();
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
+		VideosVo videosVo = videoService.queryByType(pageNumber,pageSize);
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videosVo);
 	}
 
 	/**

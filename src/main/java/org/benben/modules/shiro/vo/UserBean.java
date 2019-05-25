@@ -1,8 +1,9 @@
 package org.benben.modules.shiro.vo;
 
+import lombok.Data;
+
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Data;
 
 @Data
 public class UserBean {

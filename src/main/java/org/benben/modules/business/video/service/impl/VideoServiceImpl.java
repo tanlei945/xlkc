@@ -3,6 +3,8 @@ package org.benben.modules.business.video.service.impl;
 import org.benben.modules.business.video.entity.Video;
 import org.benben.modules.business.video.mapper.VideoMapper;
 import org.benben.modules.business.video.service.IVideoService;
+import org.benben.modules.business.video.vo.VideoVo;
+import org.benben.modules.business.video.vo.VideosVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +25,24 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
 	private VideoMapper videoMapper;
 
 	@Override
-	public List<Video> queryByType() {
-		List<Video> videos = videoMapper.queryByType();
-		return videos;
+	public VideosVo queryByType(Integer pageNumber, Integer pageSize) {
+		List<Video> videos = videoMapper.queryByType(pageNumber,pageSize);
+		Integer total = videoMapper.getTotal(pageNumber,pageSize);
+		if (total == null) {
+			total = 0;
+		}
+		VideosVo videosVo = new VideosVo();
+		videosVo.setVideoList(videos);
+		videosVo.setTotal(total);
+		return videosVo;
 	}
 
 	@Override
 	public List<Video> queryByTypeAndInvitecode(String invitecode) {
 		List<Video> videos = videoMapper.queryByInvitecode(invitecode);
+		if(videos == null){
+			return null;
+		}
 		for(int i = 0; i < videos.size(); i++) {
 			videoMapper.updateByState(videos.get(i).getId());
 		}
@@ -38,8 +50,13 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
 	}
 
 	@Override
-	public List<Video> queryVideo() {
-		List<Video> videos = videoMapper.queryVideo();
+	public List<VideoVo> queryVideo() {
+		List<VideoVo> videos = videoMapper.queryVideo();
 		return videos;
+	}
+
+	@Override
+	public List<Video> queryByVidoetype(String parentId) {
+		return videoMapper.queryByVideotype(parentId);
 	}
 }

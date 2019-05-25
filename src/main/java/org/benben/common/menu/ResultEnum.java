@@ -5,17 +5,21 @@ import lombok.Getter;
 @Getter
 public enum ResultEnum {
 
+
     OPERATION_SUCCESS(1, "操作成功"),
+    OPERATION_ERROR(0, "查询为空"),
 
     OPERATION_FAIL(0,"操作失败"),
+    VERIFY_SUCCESS(1,"验证码正确"),
+    VERIFY_FAIL(0,"验证码错误"),
 
-    QUERY_NOT_EXIST(0,"查询不存在"),
+    QUERY_NOT_EXIST(1,"查询不存在"),
 
     ERROR(0, "系统错误"),
     /**
      * 登陆注册返回code
      */
-    LOGIN_SUCCESS(0,"登陆成功"),
+    LOGIN_SUCCESS(1,"登陆成功"),
     LOGIN_FAIL(0,"登录失败"),
     USER_PWD_ERROR(0,"用户名或密码错误"),
     USER_EXIST(0, "用户已存在"),
@@ -23,7 +27,7 @@ public enum ResultEnum {
     //    PASSWORD_ERROR(306,"密码错误"),
 //    PASSWORD_RIGHT(307,"密码正确"),
     MOBILE_NOT_EXIST(0,"手机不存在"),
-    MOBILE_EXIST(0,"手机已存在"),
+    MOBILE_EXIST(1,"手机已存在"),
     /**
      * 权限不足 返回code 值范围
      */
@@ -37,6 +41,8 @@ public enum ResultEnum {
     PARAMETER_INVALID(0, "请求参数不合法"),
 
     PARAMETER_MISSING(0, "缺少参数"),
+	MOBILE_NOT_REGISTER(0,"手机号未注册"),
+	MOBILE_EXIST_REGISTER(0,"手机号已注册"),
     /**
      * 后台报错 code 之范围
      */

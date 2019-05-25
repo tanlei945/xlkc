@@ -79,7 +79,7 @@ public class OSSClientUtils {
             for (MultipartFile picFile : files) {
                 String filename = picFile.getOriginalFilename();
                 if (sum != files.length) {
-                    String uploadFile = uploadFile(picFile.getBytes(), "nihao" + filename.substring(filename.lastIndexOf(".")));
+                    String uploadFile = uploadFile(picFile.getBytes(), System.currentTimeMillis()+ filename.substring(filename.lastIndexOf(".")));
                     urlList += uploadFile + ",";
 
                 } else {

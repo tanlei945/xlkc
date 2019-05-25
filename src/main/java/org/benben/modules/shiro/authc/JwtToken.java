@@ -1,7 +1,7 @@
 package org.benben.modules.shiro.authc;
  
 import org.apache.shiro.authc.AuthenticationToken;
- 
+
 /**
  * @author Scott
  * @create 2018-07-12 15:19
