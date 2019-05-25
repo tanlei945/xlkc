@@ -42,7 +42,7 @@ import com.alibaba.fastjson.JSON;
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/userresponse/userResponse")
+@RequestMapping("/api/v1/userResponse")
 @Slf4j
 public class RestUserResponseController {
 	@Autowired

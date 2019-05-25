@@ -40,7 +40,7 @@ import com.alibaba.fastjson.JSON;
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/userposts/posts")
+@RequestMapping("/api/v1/posts")
 @Slf4j
 public class RestPostsController {
 	@Autowired

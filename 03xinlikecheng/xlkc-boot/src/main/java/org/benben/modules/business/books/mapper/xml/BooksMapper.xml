@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.benben.modules.business.books.mapper.BooksMapper">
 
+    <select id="queryByName" resultType="org.benben.modules.business.books.vo.BookVo">
+        select * from bb_books where name like '%${name}%' limit #{pageNumber},#{pageSize}
+    </select>
+    <select id="queryByNameAll" resultType="java.lang.Integer">
+        select count(*) from bb_books where name like '%${name}%'
+    </select>
 </mapper>

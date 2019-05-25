@@ -44,7 +44,7 @@ public class RestCommonController {
     @Autowired
 	private IVideoService videoService;
 
-	@PostMapping(value = "/upload_image_ali")
+	@PostMapping(value = "/upload_video_ali")
 	@ApiOperation(value = "学习园地上传视频",tags = {"学习园地接口"}, notes = "学习园地上传视频")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "name", value = "视频的名称"),
@@ -53,27 +53,59 @@ public class RestCommonController {
 			@ApiImplicitParam(name = "invitecode", value = "邀请码")
 
 	})
-	public RestResponseBean upload(@RequestParam(value = "file") MultipartFile[] files,@RequestParam String name,@RequestParam String videoType,
+	public RestResponseBean upload(@RequestParam(value = "file") MultipartFile[] files,@RequestParam String name,@RequestParam String id,@RequestParam String videoType,
 			@RequestParam Integer videoClass, @RequestParam String invitecode) {
 		String result = "";
 		Video video;
 		try {
-			result = OSSClientUtils.fileVideoUpload(files,name,videoType);
-			if (videoClass == 0) {
-				video = new Video(name, result, videoType, videoClass, null);
-			}else {
-				video = new Video(name, result, videoType, videoClass, invitecode);
+			if (StringUtils.isBlank(id)) {
+				result = OSSClientUtils.fileVideoUpload(files, name, videoType);
+				if (videoClass == 0) {
+					video = new Video(name, result, videoType, videoClass, null);
+				} else {
+					video = new Video(name, result, videoType, videoClass, invitecode);
+				}
+				videoService.save(video);
+			} else {
+				result = OSSClientUtils.fileVideoUpload(files, name, videoType);
+				if (videoClass == 0) {
+					video = new Video(name, result, videoType, videoClass, null);
+				} else {
+					video = new Video(name, result, videoType, videoClass, invitecode);
+				}
+				video.setId(id);
+				videoService.updateById(video);
 			}
-
-			videoService.save(video);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), result);
 	}
+	@PostMapping(value = "/upload_image_ali")
+	@ApiOperation(value = "学习园地上传视频封面",tags = {"学习园地接口"}, notes = "学习园地上传视频封面")
+	public RestResponseBean uploadPiture(@RequestParam(value = "file") MultipartFile[] files, String id) {
+		String result = "";
 
+		try {
+			if (StringUtils.isBlank(id)) {
+				result = OSSClientUtils.fileUpload(files);
+				Video video = new Video();
+				video.setPicture(result);
+				videoService.save(video);
+			} else {
+				result = OSSClientUtils.fileUpload(files);
+				Video video = new Video();
+				video.setId(id);
+				video.setPicture(result);
+				videoService.updateById(video);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), result);
+	}
 
 	@PostMapping("/down_file")
 	@ApiOperation(value = "使用七牛云下载文件", tags = "通用接口", notes = "使用七牛云下载文件")

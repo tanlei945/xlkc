@@ -2,6 +2,8 @@ package org.benben.modules.business.video.service;
 
 import org.benben.modules.business.video.entity.Video;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.benben.modules.business.video.vo.VideoVo;
+import org.benben.modules.business.video.vo.VideosVo;
 
 import java.util.List;
 
@@ -13,10 +15,11 @@ import java.util.List;
  */
 public interface IVideoService extends IService<Video> {
 
-	List<Video> queryByType();
+	VideosVo queryByType(Integer pageNumber, Integer pageSize);
 
 	List<Video> queryByTypeAndInvitecode( String invitecode);
 
-	List<Video> queryVideo();
+	List<VideoVo> queryVideo();
 
+	List<Video> queryByVidoetype(String parentId);
 }

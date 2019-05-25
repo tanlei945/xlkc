@@ -6,17 +6,16 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.base.Joiner;
-
-import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.benben.common.constant.DataBaseConstant;
 import org.benben.common.exception.JeecgBootException;
 import org.benben.common.util.SpringContextUtils;
 import org.benben.common.util.oConvertUtils;
 import org.benben.modules.system.model.SysUserCacheInfo;
 import org.benben.modules.system.util.JeecgDataAutorUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * @author Scott
@@ -156,7 +155,7 @@ public class JwtUtil {
 	 * @param user
 	 * @return
 	 */
-	public static String getUserSystemData(String key,SysUserCacheInfo user) {
+	public static String getUserSystemData(String key, SysUserCacheInfo user) {
 		if(user==null) {
 			user = JeecgDataAutorUtils.loadUserInfo();
 		}

@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 普通用户
+ * @Description: sadfas
  * @author： jeecg-boot
- * @date：   2019-04-23
+ * @date：   2019-05-23
  * @version： V1.0
  */
 @Data
@@ -36,12 +36,21 @@ public class User implements Serializable {
 	/**密码*/
 	@Excel(name = "密码", width = 15)
 	private java.lang.String password;
+	/**numberid*/
+	@Excel(name = "numberid", width = 15)
+	private java.lang.Integer numberid;
 	/**密码盐*/
 	@Excel(name = "密码盐", width = 15)
 	private java.lang.String salt;
 	/**电子邮箱*/
 	@Excel(name = "电子邮箱", width = 15)
 	private java.lang.String email;
+	/**区号名称*/
+	@Excel(name = "区号名称", width = 15)
+	private java.lang.String areaname;
+	/**号码归属地区号*/
+	@Excel(name = "号码归属地区号", width = 15)
+	private java.lang.String areacode;
 	/**手机号*/
 	@Excel(name = "手机号", width = 15)
 	private java.lang.String mobile;

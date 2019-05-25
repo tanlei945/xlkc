@@ -79,6 +79,9 @@ public class RestUserController {
     @Autowired
     private RedisUtil redisUtil;
 
+    @Autowired
+	private IhuyiService ihuyiService;
+
 	@PostMapping(value = "/verify_user")
 //	@ApiOperation(value = "验证是否完善个人资料", tags = "用户接口",notes = "验证是否完善个人资料")
 	public RestResponseBean verifyUser(@RequestParam String chinaname, @RequestParam String englishname, @RequestParam String referrer) {
@@ -100,10 +103,17 @@ public class RestUserController {
 	@PostMapping(value = "/updateUser")
 	@ApiOperation(value = "更新用户信息",tags = "用户接口",notes = "更新用户信息")
 	public RestResponseBean updateUser(@RequestBody User user){
+		User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+
+		if(user1==null) {
+			return new RestResponseBean(ResultEnum.TOKEN_OVERDUE.getValue(),ResultEnum.TOKEN_OVERDUE.getDesc(),null);
+		}
+
 		//判断用户信息是否为空
 		if(user==null) {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
+		user.setId(user1.getId());
 		if (userService.updateById(user)){
 			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"更新用户成功！");
 		}
@@ -111,15 +121,14 @@ public class RestUserController {
 	}
     /**
      * 通过id查询
-     * @param id
      * @return
      */
     @GetMapping(value = "/queryById")
 //   @ApiOperation(value = "通过id查询用户", tags = {"用户接口"}, notes = "通过id查询用户")
 	@ApiOperation(value = "验证是否完善个人资料", tags = "用户接口",notes = "验证是否完善个人资料")
-    public RestResponseBean queryById(@RequestParam(name="id",required=true) String id) {
-
-        User user = userService.getById(id);
+    public RestResponseBean queryById() {
+		User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+        User user = userService.getById(user1.getId());
 
 		if (!StringUtils.isNotBlank(user.getChinaname()) || !StringUtils.isNotBlank(user.getEnglishname()) || !StringUtils.isNotBlank(user.getReferrer())) {
             return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
@@ -141,8 +150,18 @@ public class RestUserController {
             @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String",defaultValue = "1",required = true),
             @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
     })
-    public RestResponseBean register(@RequestParam String mobile, @RequestParam String password) {
+    public RestResponseBean register(@RequestParam String mobile, @RequestParam String password,@RequestParam String areaname, @RequestParam String areacode, @RequestParam Integer verify) {
 
+		if (!ihuyiService.check(verify)) {
+			return new RestResponseBean(ResultEnum.VERIFY_FAIL.getValue(),ResultEnum.VERIFY_FAIL.getDesc(),null);
+		}
+		JSONObject obj = new JSONObject();
+
+		//检查手机号是否注册
+		User user1 = userService.queryByMobile(mobile);
+		if (user1 != null) {
+			return new RestResponseBean(ResultEnum.MOBILE_EXIST_REGISTER.getValue(),ResultEnum.MOBILE_EXIST_REGISTER.getDesc(),null);
+		}
         User user = new User();
 
         if(org.apache.commons.lang3.StringUtils.equals(mobile,"")|| org.apache.commons.lang3.StringUtils.equals(password,"")){
@@ -156,8 +175,11 @@ public class RestUserController {
             user.setSalt(salt);
             String passwordEncode = PasswordUtil.encrypt(mobile, password, salt);
             user.setPassword(passwordEncode);
+            user.setAreacode(areacode);
+            user.setAreaname(areaname);
             userService.save(user);
-            return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),user);
+			obj = tokenBuild(user);
+            return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),obj);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -180,8 +202,7 @@ public class RestUserController {
             @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String",defaultValue = "1",required = true),
             @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
     })
-    public RestResponseBean login(@RequestParam String mobile, @RequestParam String password) {
-
+    public RestResponseBean login(@RequestParam String mobile, @RequestParam String password){
         JSONObject obj = new JSONObject();
         User user = userService.queryByMobile(mobile);
 
@@ -202,41 +223,25 @@ public class RestUserController {
         return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), obj);
     }
 
-
-    /**
-     * 短信登录
-     *
-     * @param smsDTO
-     * @param bindingResult
-     * @return
-     */
     @PostMapping(value = "/mobileLogin")
-  /*  @ApiOperation(value = "手机验证码登录", tags = {"用户接口"}, notes = "手机验证码登录")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String",defaultValue = "1",required = true),
-            @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
-    })*/
-    public RestResponseBean mobilelogin(@RequestBody @Valid SmsDTO smsDTO, BindingResult bindingResult) {
+	@ApiOperation(value = "验证码登录",tags = "用户接口",notes = "验证码登录")
+	public RestResponseBean mobileLogin(@RequestParam String mobile, @RequestParam Integer verify) {
 
-        if (bindingResult.hasErrors() && org.apache.commons.lang3.StringUtils.isBlank(smsDTO.getCaptcha())) {
-            return new RestResponseBean(ResultEnum.PARAMETER_MISSING.getValue(), ResultEnum.PARAMETER_MISSING.getDesc(), null);
-        }
+		if (!ihuyiService.check(verify)) {
+			return new RestResponseBean(ResultEnum.VERIFY_FAIL.getValue(),ResultEnum.VERIFY_FAIL.getDesc(),null);
+		}
+		if (StringUtils.isBlank(mobile)) {
+			return new RestResponseBean(ResultEnum.PARAMETER_MISSING.getValue(), ResultEnum.PARAMETER_MISSING.getDesc(), null);
+		}
 
-        switch (ismsService.check(smsDTO.getMobile(), smsDTO.getEvent(), smsDTO.getCaptcha())) {
-            case 1:
-                return new RestResponseBean(ResultEnum.SMS_CODE_OVERTIME.getValue(), ResultEnum.SMS_CODE_OVERTIME.getDesc(), null);
-            case 2:
-                return new RestResponseBean(ResultEnum.SMS_CODE_ERROR.getValue(), ResultEnum.SMS_CODE_ERROR.getDesc(), null);
-        }
+		User user = userService.queryByMobile(mobile);
 
-        User user = userService.queryByMobile(smsDTO.getMobile());
+		if (user == null) {
+			return new RestResponseBean(ResultEnum.USER_NOT_EXIST.getValue(), ResultEnum.USER_NOT_EXIST.getDesc(), null);
+		}
 
-        if (user == null) {
-            return new RestResponseBean(ResultEnum.USER_NOT_EXIST.getValue(), ResultEnum.USER_NOT_EXIST.getDesc(), null);
-        }
-
-        return new RestResponseBean(ResultEnum.LOGIN_SUCCESS.getValue(), ResultEnum.LOGIN_SUCCESS.getDesc(), tokenBuild(user));
-    }
+		return new RestResponseBean(ResultEnum.LOGIN_SUCCESS.getValue(), ResultEnum.LOGIN_SUCCESS.getDesc(), tokenBuild(user));
+	}
 
     /**
      * 用户修改
@@ -368,10 +373,15 @@ public class RestUserController {
     @PostMapping(value = "/forgetPassword")
     @ApiOperation(value = "忘记密码/修改密码", tags = {"用户接口"}, notes = "忘记密码/修改密码")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String",defaultValue = "1",required = true),
-            @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String",defaultValue = "1",required = true)
+            @ApiImplicitParam(name = "mobile",value = "用户手机号",dataType = "String"),
+            @ApiImplicitParam(name = "password",value = "用户密码",dataType = "String"),
+            @ApiImplicitParam(name = "verify",value = "验证码",dataType = "String")
     })
-    public RestResponseBean forgetPassword(@RequestParam String mobile,@RequestParam String password){
+    public RestResponseBean forgetPassword(@RequestParam String mobile,@RequestParam String password, @RequestParam Integer verify, @RequestParam String areacode) {
+
+		if (!ihuyiService.check(verify)) {
+			return new RestResponseBean(ResultEnum.VERIFY_FAIL.getValue(),ResultEnum.VERIFY_FAIL.getDesc(),null);
+		}
 
         if(org.apache.commons.lang3.StringUtils.equals(mobile,"")|| org.apache.commons.lang3.StringUtils.equals(password,"")){
             return new RestResponseBean(ResultEnum.PARAMETER_MISSING.getValue(), ResultEnum.PARAMETER_MISSING.getDesc(), null);

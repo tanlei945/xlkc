@@ -20,7 +20,6 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @TableName("bb_video")
 public class Video implements Serializable {
     private static final long serialVersionUID = 1L;
-    
 	/**主键ID*/
 	@TableId(type = IdType.UUID)
 	private java.lang.String id;
@@ -30,6 +29,14 @@ public class Video implements Serializable {
 	/**视频名称*/
 	@Excel(name = "视频名称", width = 15)
 	private java.lang.String name;
+	@Excel(name = "父类id", width = 15)
+	private java.lang.String parentId;
+	@Excel(name = "picture", width = 15)
+	private java.lang.String picture;
+
+	@Excel(name = "introduction", width = 15)
+	private java.lang.String introduction;
+
 	/**视频地址*/
 	@Excel(name = "视频地址", width = 15)
 	private java.lang.String videoUrl;
@@ -58,4 +65,16 @@ public class Video implements Serializable {
 	/**修改*/
 	@Excel(name = "修改", width = 15)
 	private java.lang.String updateBy;
+
+	public Video(){
+	}
+
+	public Video( String name, String videoUrl, String videoType, Integer videoClass,
+			String invitecode) {
+		this.name = name;
+		this.videoUrl = videoUrl;
+		this.videoType = videoType;
+		this.videoClass = videoClass;
+		this.invitecode = invitecode;
+	}
 }

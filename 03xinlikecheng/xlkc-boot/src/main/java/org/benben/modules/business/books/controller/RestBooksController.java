@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
@@ -24,6 +25,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.benben.modules.business.books.vo.BooksVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -46,17 +48,26 @@ import com.alibaba.fastjson.JSON;
  */
 @RestController
 @RequestMapping("/api/v1/books")
+@Api(tags = {"书店接口"})
 @Slf4j
 public class RestBooksController {
 	@Autowired
 	private IBooksService booksService;
 
 	@GetMapping("/queryBooks")
-	@ApiOperation(value = "查询全部书籍", tags ="书店接口", notes = "查询全部书籍")
-	public RestResponseBean queryBooks() {
-		List<Books> books = booksService.queryBooks();
+	@ApiOperation(value = "分页显示全部书籍", tags ={"书店接口"}, notes = "分页显示全部书籍")
+	public RestResponseBean queryBooks(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+		BooksVo books = booksService.queryBooks(pageNumber,pageSize);
 		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),books);
 	}
+	@GetMapping("/queryByName")
+	@ApiOperation(value = "分页模糊查询名称书籍", tags ={"书店接口"}, notes = "分页模糊查询名称书籍")
+	public RestResponseBean queryByName(@RequestParam Integer pageNumber, @RequestParam Integer pageSize, @RequestParam String name) {
+		BooksVo books = booksService.queryByName(pageNumber,pageSize,name);
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),books);
+	}
+
+
 
 	/**
 	  * 分页列表查询
@@ -86,7 +97,7 @@ public class RestBooksController {
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	@ApiOperation(value = "添加数据接口", tags = "书店接口", notes = "添加数据接口")
+//	@ApiOperation(value = "添加数据接口", tags = "书店接口", notes = "添加数据接口")
 	public Result<Books> add(@RequestBody Books books) {
 		Result<Books> result = new Result<Books>();
 		try {
@@ -166,6 +177,7 @@ public class RestBooksController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
+	@ApiOperation(value = "查看书籍详情", tags = {"书店接口"}, notes = "查看书籍详情")
 	public Result<Books> queryById(@RequestParam(name="id",required=true) String id) {
 		Result<Books> result = new Result<Books>();
 		Books books = booksService.getById(id);
