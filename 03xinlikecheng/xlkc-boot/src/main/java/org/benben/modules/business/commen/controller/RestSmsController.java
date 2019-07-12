@@ -49,13 +49,13 @@ public class RestSmsController {
 
     @PostMapping(value = "/ihuyi_send")
 	@ApiOperation(value = "使用互亿无线发送短信验证码",tags = "短信接口",notes = "使用互亿无线发送验证码")
-	public RestResponseBean ihuyiSend(@RequestParam String mobile,@RequestParam String areacode){
+	public RestResponseBean ihuyiSend(@RequestParam String mobile,@RequestParam String areacode,@RequestParam String event){
 		if (mobile.equals("") || mobile == null) {
 			throw new RuntimeException("手机号为空");
 		}
 		String phone = areacode + " " +mobile;
 		//发送短信
-		 verify = ihuyiService.sendIhuyi(phone);
+		 verify = ihuyiService.sendIhuyi(areacode,mobile,event);
 		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), verify);
 	}
 
