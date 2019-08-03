@@ -41,7 +41,7 @@ public class OSSClientUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String fileVideoUpload(MultipartFile[] files, String name, String videoType) throws Exception {
+	public static String fileVideoUpload(MultipartFile[] files) throws Exception {
 
 		String urlList = "";
 		int sum = -1;
@@ -49,8 +49,8 @@ public class OSSClientUtils {
 			for (MultipartFile picFile : files) {
 				String filename = picFile.getOriginalFilename();
 				if (sum != files.length) {
-					String uploadFile = uploadFile(picFile.getBytes(), videoType + "/" + name + filename.substring(filename.lastIndexOf(".")));
-					urlList += uploadFile + ",";
+					String uploadFile = uploadFile(picFile.getBytes(),System.currentTimeMillis() + filename.substring(filename.lastIndexOf(".")));
+					urlList += uploadFile ;
 
 				} else {
 					String uploadFile = uploadFile(picFile.getBytes(), System.currentTimeMillis() + filename.substring(filename.lastIndexOf(".")));
@@ -80,7 +80,7 @@ public class OSSClientUtils {
                 String filename = picFile.getOriginalFilename();
                 if (sum != files.length) {
                     String uploadFile = uploadFile(picFile.getBytes(), System.currentTimeMillis()+ filename.substring(filename.lastIndexOf(".")));
-                    urlList += uploadFile + ",";
+                    urlList += uploadFile;
 
                 } else {
                     String uploadFile = uploadFile(picFile.getBytes(), System.currentTimeMillis() + filename.substring(filename.lastIndexOf(".")));
