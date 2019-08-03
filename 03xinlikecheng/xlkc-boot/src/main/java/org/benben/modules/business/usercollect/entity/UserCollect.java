@@ -27,6 +27,12 @@ public class UserCollect implements Serializable {
 	/**和帖子相关联id*/
 	@Excel(name = "和帖子相关联id", width = 15)
 	private java.lang.String postsId;
+	/**用户相关联id*/
+	@Excel(name = "用户相关联id", width = 15)
+	private java.lang.String userId;
+	/**1/收藏，0/取消收藏 */
+	@Excel(name = "1/收藏，0/取消收藏 ", width = 15)
+	private java.lang.Integer type;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

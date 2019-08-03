@@ -15,7 +15,11 @@ import java.util.List;
  */
 public interface IUserCollectService extends IService<UserCollect> {
 
-	List<UserCollectVo> queryUserPosts();
+	List<UserCollectVo> queryUserPosts(String uid);
 
 	Posts queryByPostsId(String postsId);
+
+	UserCollect getCollect(String postId, String id);
+
+	List<UserCollect> getPostIdCollect(String postId);
 }
