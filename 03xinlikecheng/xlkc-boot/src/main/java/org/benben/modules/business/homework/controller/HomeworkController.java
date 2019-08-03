@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.course.entity.Course;
+import org.benben.modules.business.course.service.ICourseService;
 import org.benben.modules.business.homework.entity.Homework;
 import org.benben.modules.business.homework.service.IHomeworkService;
 
@@ -45,7 +47,10 @@ import com.alibaba.fastjson.JSON;
 public class HomeworkController {
 	@Autowired
 	private IHomeworkService homeworkService;
-	
+
+	@Autowired
+	private ICourseService courseService;
+
 	/**
 	  * 分页列表查询
 	 * @param homework
@@ -63,6 +68,11 @@ public class HomeworkController {
 		QueryWrapper<Homework> queryWrapper = QueryGenerator.initQueryWrapper(homework, req.getParameterMap());
 		Page<Homework> page = new Page<Homework>(pageNo, pageSize);
 		IPage<Homework> pageList = homeworkService.page(page, queryWrapper);
+		List<Homework> list = pageList.getRecords();
+		for (Homework homework1 : list) {
+			Course course = courseService.getById(homework1.getCourseId());
+			homework1.setCourseName(course.getCourseName());
+		}
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;

@@ -33,6 +33,10 @@ public class Deliveryaddress implements Serializable {
 	/**收货地址*/
 	@Excel(name = "收货地址", width = 15)
 	private java.lang.String address;
+	@Excel(name = "收货地址", width = 15)
+	private java.lang.String addressCode;
+	@Excel(name = "收货地址", width = 15)
+	private java.lang.String detailAddress;
 	/**0/不是默认 1/默认地址*/
 	@Excel(name = "0/不是默认 1/默认地址", width = 15)
 	private java.lang.Integer state;

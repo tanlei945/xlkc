@@ -15,8 +15,16 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface DeliveryaddressMapper extends BaseMapper<Deliveryaddress> {
 
-	@Select("")
-	List<Deliveryaddress> queryBooks(Integer pageNumber, Integer pageSize);
+	@Select("select * from bb_deliveryaddress ORDER BY create_time desc limit #{pageNumber},#{pageSize} ")
+	List<Deliveryaddress> queryBooks(@Param("pageNumber") Integer pageNumber, @Param("pageSize") Integer pageSize);
 
+	@Select("select count(*) from bb_deliveryaddress")
 	Integer queryAll();
+
+	@Select("select * from bb_deliveryaddress where state = 1")
+	Deliveryaddress queryByState();
+
+	@Select("select * from bb_deliveryaddress")
+	List<Deliveryaddress> getAddress();
+
 }

@@ -3,6 +3,7 @@ package org.benben.modules.business.homework.entity;
 import java.io.Serializable;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -30,12 +31,17 @@ public class Homework implements Serializable {
 	/**课程相关联id*/
 	@Excel(name = "课程相关联id", width = 15)
 	private java.lang.String courseId;
+	@TableField(exist = false)
+	private java.lang.String courseName;
 	/**小组名称*/
 	@Excel(name = "小组名称", width = 15)
 	private java.lang.String groupName;
 	/**组员*/
 	@Excel(name = "组员", width = 15)
 	private java.lang.String crew;
+
+	@Excel(name = "语种", width = 15)
+	private java.lang.Integer language;
 	/**文档路径*/
 	@Excel(name = "文档路径", width = 15)
 	private java.lang.String wordUrl;
@@ -60,6 +66,10 @@ public class Homework implements Serializable {
 	/**视频名称*/
 	@Excel(name = "视频名称", width = 15)
 	private java.lang.String videoName;
+	@TableField(exist = false)
+	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+	private java.util.Date courseTime;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

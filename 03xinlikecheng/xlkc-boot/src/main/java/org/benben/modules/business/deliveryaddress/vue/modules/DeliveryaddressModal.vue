@@ -47,7 +47,7 @@
   import moment from "moment"
 
   export default {
-    name: "DeliveryaddressModal",
+    name: "DeliveryAddressModal",
     data () {
       return {
         title:"操作",
@@ -67,8 +67,8 @@
         validatorRules:{
         },
         url: {
-          add: "/deliveryaddress/deliveryaddress/add",
-          edit: "/deliveryaddress/deliveryaddress/edit",
+          add: "/deliveryaddress/deliveryAddress/add",
+          edit: "/deliveryaddress/deliveryAddress/edit",
         },
       }
     },

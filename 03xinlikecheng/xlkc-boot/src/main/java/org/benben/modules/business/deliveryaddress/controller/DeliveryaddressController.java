@@ -8,7 +8,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
+import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
 import org.benben.modules.business.deliveryaddress.entity.Deliveryaddress;
@@ -45,7 +48,14 @@ import com.alibaba.fastjson.JSON;
 public class DeliveryaddressController {
 	@Autowired
 	private IDeliveryaddressService deliveryaddressService;
-	
+
+	@PostMapping("/getAddress")
+	public RestResponseBean getAddress() {
+		List<Deliveryaddress> deliveryaddresses = deliveryaddressService.getAddress();
+		return new RestResponseBean(ResultEnum.OPERATION_CORRECT.getValue(),ResultEnum.OPERATION_CORRECT.getDesc(),deliveryaddresses);
+
+	}
+
 	/**
 	  * 分页列表查询
 	 * @param deliveryaddress

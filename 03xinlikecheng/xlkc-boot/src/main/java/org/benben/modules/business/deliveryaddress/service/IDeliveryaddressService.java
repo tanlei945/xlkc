@@ -4,6 +4,8 @@ import org.benben.modules.business.deliveryaddress.entity.Deliveryaddress;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.benben.modules.business.deliveryaddress.vo.DeliveryaddresVo;
 
+import java.util.List;
+
 /**
  * @Description: 收获地址管理
  * @author： jeecg-boot
@@ -14,4 +16,7 @@ public interface IDeliveryaddressService extends IService<Deliveryaddress> {
 
 	DeliveryaddresVo listPage(Integer pageNumber, Integer pageSize);
 
+	Deliveryaddress queryByState();
+
+	List<Deliveryaddress> getAddress();
 }

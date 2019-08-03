@@ -98,23 +98,23 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <deliveryaddress-modal ref="modalForm" @ok="modalFormOk"></deliveryaddress-modal>
+    <deliveryAddress-modal ref="modalForm" @ok="modalFormOk"></deliveryAddress-modal>
   </a-card>
 </template>
 
 <script>
-  import DeliveryaddressModal from './modules/DeliveryaddressModal'
+  import DeliveryAddressModal from './modules/DeliveryAddressModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "DeliveryaddressList",
+    name: "DeliveryAddressList",
     mixins:[JeecgListMixin],
     components: {
-      DeliveryaddressModal
+      DeliveryAddressModal
     },
     data () {
       return {
-        description: '收获地址管理管理页面',
+        description: '收货地址表管理管理页面',
         // 表头
         columns: [
           {
@@ -155,11 +155,11 @@
           }
         ],
 		url: {
-          list: "/deliveryaddress/deliveryaddress/list",
-          delete: "/deliveryaddress/deliveryaddress/delete",
-          deleteBatch: "/deliveryaddress/deliveryaddress/deleteBatch",
-          exportXlsUrl: "deliveryaddress/deliveryaddress/exportXls",
-          importExcelUrl: "deliveryaddress/deliveryaddress/importExcel",
+          list: "/deliveryaddress/deliveryAddress/list",
+          delete: "/deliveryaddress/deliveryAddress/delete",
+          deleteBatch: "/deliveryaddress/deliveryAddress/deleteBatch",
+          exportXlsUrl: "deliveryaddress/deliveryAddress/exportXls",
+          importExcelUrl: "deliveryaddress/deliveryAddress/importExcel",
        },
     }
   },
