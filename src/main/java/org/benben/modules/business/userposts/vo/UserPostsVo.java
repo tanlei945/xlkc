@@ -22,10 +22,10 @@ public class UserPostsVo {
 	private java.lang.String postsName;
 	/**帖子内容*/
 	@Excel(name = "帖子内容", width = 15)
-	private java.lang.String comment;
+	private java.lang.String content;
 	/**图片地址*/
 	@Excel(name = "图片地址", width = 15)
-	private java.lang.String pictureUrl;
+	private java.lang.String introImg;
 	/**点赞次数*/
 	@Excel(name = "点赞次数", width = 15)
 	private java.lang.Integer liknum;

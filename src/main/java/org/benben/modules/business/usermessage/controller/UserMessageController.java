@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.user.entity.User;
+import org.benben.modules.business.user.service.IUserService;
 import org.benben.modules.business.usermessage.entity.UserMessage;
 import org.benben.modules.business.usermessage.service.IUserMessageService;
 
@@ -45,7 +47,9 @@ import com.alibaba.fastjson.JSON;
 public class UserMessageController {
 	@Autowired
 	private IUserMessageService userMessageService;
-	
+	@Autowired
+	private IUserService userService;
+
 	/**
 	  * 分页列表查询
 	 * @param userMessage
@@ -61,8 +65,14 @@ public class UserMessageController {
 									  HttpServletRequest req) {
 		Result<IPage<UserMessage>> result = new Result<IPage<UserMessage>>();
 		QueryWrapper<UserMessage> queryWrapper = QueryGenerator.initQueryWrapper(userMessage, req.getParameterMap());
+		queryWrapper.eq("state",2);
 		Page<UserMessage> page = new Page<UserMessage>(pageNo, pageSize);
 		IPage<UserMessage> pageList = userMessageService.page(page, queryWrapper);
+		List<UserMessage> records = pageList.getRecords();
+		for (UserMessage record : records) {
+			User user = userService.getById(record.getUserId());
+			record.setNickname(user.getNickname());
+		}
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;

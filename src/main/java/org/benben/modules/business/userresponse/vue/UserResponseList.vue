@@ -8,7 +8,7 @@
 
           <a-col :md="6" :sm="8">
             <a-form-item label="评论人id">
-              <a-input placeholder="请输入评论人id" v-model="queryParam.evaluateId"></a-input>
+              <a-input placeholder="请输入评论人id" v-model="queryParam.evaluateUserId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -18,6 +18,11 @@
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
+            <a-form-item label="评论表id">
+              <a-input placeholder="请输入评论表id" v-model="queryParam.evaluateId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="回复内容">
               <a-input placeholder="请输入回复内容" v-model="queryParam.comment"></a-input>
             </a-form-item>
@@ -109,7 +114,7 @@
     },
     data () {
       return {
-        description: '用户反馈表管理页面',
+        description: '用户回复表管理管理页面',
         // 表头
         columns: [
           {
@@ -125,12 +130,17 @@
 		   {
             title: '评论人id',
             align:"center",
-            dataIndex: 'evaluateId'
+            dataIndex: 'evaluateUserId'
            },
 		   {
             title: '回复用户id',
             align:"center",
             dataIndex: 'userId'
+           },
+		   {
+            title: '评论表id',
+            align:"center",
+            dataIndex: 'evaluateId'
            },
 		   {
             title: '回复内容',

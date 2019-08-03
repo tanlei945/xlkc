@@ -17,9 +17,12 @@ import org.benben.modules.business.userposts.vo.UserPostsVo;
  */
 public interface UserPostsMapper extends BaseMapper<UserPosts> {
 
-	@Select("select * from user_posts u INNER JOIN bb_posts p on u.posts_id = p.id")
-	List<UserPostsVo> queryUserPosts();
+	@Select("select * from user_posts u INNER JOIN bb_posts p on u.posts_id = p.id where u.user_id = #{uid} ORDER BY u.create_time DESC ")
+	List<UserPostsVo> queryUserPosts(String uid);
 
 	@Select("select * from bb_posts where id = #{postsId}")
 	Posts queryByPostsId(String postsId);
+
+	@Select("select * from user_posts where posts_id = #{postId}")
+	UserPosts getUserPosts(String postId);
 }

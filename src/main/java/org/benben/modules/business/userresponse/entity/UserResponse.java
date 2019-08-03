@@ -11,9 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 用户反馈表
+ * @Description: 用户回复表管理
  * @author： jeecg-boot
- * @date：   2019-05-23
+ * @date：   2019-06-11
  * @version： V1.0
  */
 @Data
@@ -26,10 +26,13 @@ public class UserResponse implements Serializable {
 	private java.lang.String id;
 	/**评论人id*/
 	@Excel(name = "评论人id", width = 15)
-	private java.lang.String evaluateId;
+	private java.lang.String evaluateUserId;
 	/**回复用户id*/
 	@Excel(name = "回复用户id", width = 15)
 	private java.lang.String userId;
+	/**评论表id*/
+	@Excel(name = "评论id", width = 15)
+	private java.lang.String evaluateId;
 	/**回复内容*/
 	@Excel(name = "回复内容", width = 15)
 	private java.lang.String comment;

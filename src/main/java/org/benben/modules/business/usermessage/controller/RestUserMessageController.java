@@ -1,43 +1,43 @@
 package org.benben.modules.business.usermessage.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.usermessage.entity.UserMessage;
 import org.benben.modules.business.usermessage.service.IUserMessageService;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.extern.slf4j.Slf4j;
-
-import org.benben.modules.business.usermessage.vo.UserMessageVo;
+import org.benben.modules.business.usermessage.vo.EvaluateMessageVo;
+import org.benben.modules.business.usermessage.vo.LikeVo;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.fastjson.JSON;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
  /**
  * @Title: Controller
@@ -56,6 +56,28 @@ public class RestUserMessageController {
 
 //	public RestResponseBean
 
+	 //获取点赞的消息或者评论的消息第一条
+	 @GetMapping("/getNew")
+	 @ApiOperation(value = "取点赞的消息或者评论的消息第一条（0/点赞1/评论）", tags = "我的消息", notes = "取点赞的消息或者评论的消息第一条（0/点赞1/评论）")
+	 public RestResponseBean getNew(@RequestParam Integer state) {
+		 User user = (User) SecurityUtils.getSubject().getPrincipal();
+		 if(state == 0) {
+			 LikeVo likeVo = userMessageService.queryNewLike(state,user);
+			 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),likeVo);
+		 } else {
+			 EvaluateMessageVo evaluateMessageVo = userMessageService.queryNewLikes(state, user.getId());
+			 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),evaluateMessageVo);
+		 }
+	 }
+
+	 // 查询我的消息未读的有几条
+	 @GetMapping("/getMessageNum")
+	 @ApiOperation(value = "查看系统消息未读的有几条", tags = "我的消息", notes = "查看系统消息未读的有几条")
+	 public RestResponseBean getMessageNum() {
+	 	Integer number = userMessageService.getMessageNum();
+	 	return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),number);
+	 }
+
 	 /**
 	  * 查询系统消息
 	  * @param state
@@ -65,17 +87,19 @@ public class RestUserMessageController {
 	@ApiOperation(value = "查询系统消息接口", tags = "我的消息", notes = "查询系统消息接口")
 	@ApiImplicitParam(name = "state",value = "消息状态 0/赞同的消息 1/评论的消息 2/普通消息")
 	public RestResponseBean queryByState(@RequestParam Integer state) {
+		User user = (User) SecurityUtils.getSubject().getPrincipal();
 		if (state == null) {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
 		if (state == 2 ) {
-			List<UserMessage> userMessages = userMessageService.queryByState(state);
+			List<UserMessage> userMessages = userMessageService.queryByState(state,user.getId());
 			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessages);
 		} else if(state == 0) {
-			List<UserMessageVo> userMessageVos = userMessageService.queryByLike(state);
+			List<LikeVo> userMessageVos = userMessageService.queryByLike(state,user);
 			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessageVos);
 		} else {
-			return null;
+			List<EvaluateMessageVo> userMessageVos = userMessageService.queryByLikes(state, user.getId());
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessageVos);
 		}
 
 	}
@@ -147,20 +171,23 @@ public class RestUserMessageController {
 	 * @param id
 	 * @return
 	 */
-	@DeleteMapping(value = "/delete")
-	public Result<UserMessage> delete(@RequestParam(name="id",required=true) String id) {
+	@PostMapping(value = "/delete")
+	@ApiOperation(value = "删除系统消息", tags = "我的消息", notes = "删除系统消息")
+	public RestResponseBean delete(@RequestParam String id) {
 		Result<UserMessage> result = new Result<UserMessage>();
 		UserMessage userMessage = userMessageService.getById(id);
 		if(userMessage==null) {
 			result.error500("未找到对应实体");
+			return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"未找到对应实体");
 		}else {
 			boolean ok = userMessageService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
+				return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"删除成功");
 			}
 		}
-		
-		return result;
+		return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"未找到对应实体");
+
 	}
 	
 	/**
@@ -186,16 +213,19 @@ public class RestUserMessageController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<UserMessage> queryById(@RequestParam(name="id",required=true) String id) {
+	@ApiOperation(value = "获取系统消息详情", tags = "我的消息", notes = "获取系统消息详情")
+	public RestResponseBean queryById(@RequestParam(name="id",required=true) String id) {
 		Result<UserMessage> result = new Result<UserMessage>();
 		UserMessage userMessage = userMessageService.getById(id);
 		if(userMessage==null) {
 			result.error500("未找到对应实体");
+			return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"未找到对应实体");
 		}else {
 			result.setResult(userMessage);
 			result.setSuccess(true);
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userMessage);
 		}
-		return result;
+
 	}
 
   /**

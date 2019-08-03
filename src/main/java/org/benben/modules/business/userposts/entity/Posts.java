@@ -29,13 +29,13 @@ public class Posts implements Serializable {
 	private java.lang.String courseTypeId;
 	/**帖子分类名称*/
 	@Excel(name = "帖子分类名称", width = 15)
-	private java.lang.String coursePostsName;
+	private java.lang.String courseTypeName;
 	/**帖子标题*/
 	@Excel(name = "帖子标题", width = 15)
 	private java.lang.String postsName;
 	/**帖子内容*/
 	@Excel(name = "帖子内容", width = 15)
-	private java.lang.String comment;
+	private java.lang.String content;
 	/**图片地址*/
 	@Excel(name = "图片地址", width = 15)
 	private java.lang.String pictureUrl;
@@ -45,6 +45,9 @@ public class Posts implements Serializable {
 	/**评论数*/
 	@Excel(name = "评论数", width = 15)
 	private java.lang.Integer commentNum;
+	/**搜索次数*/
+	@Excel(name = "搜索次数", width = 15)
+	private java.lang.Integer searchNum;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

@@ -9,12 +9,15 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.SecurityUtils;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.userfeedback.entity.UserFeedback;
 import org.benben.modules.business.userfeedback.service.IUserFeedbackService;
 
@@ -45,6 +48,7 @@ import com.alibaba.fastjson.JSON;
  */
 @RestController
 @RequestMapping("/api/v1/userFeedback")
+@Api(tags = {"用户接口"})
 @Slf4j
 public class RestUserFeedbackController {
 	@Autowired
@@ -79,14 +83,16 @@ public class RestUserFeedbackController {
 	 */
 	@PostMapping(value = "/add")
 	@ApiOperation(value = "添加用户反馈数据", tags = "用户接口", notes = "添加用户反馈数据")
-	@ApiImplicitParams({
+	/*@ApiImplicitParams({
 			@ApiImplicitParam(name = "userFeedback.uid", value = "用户相关联id"),
 			@ApiImplicitParam(name = "userFeedback.questionType", value = "问题类型  1下载/加载问题 2/付费问题 3/课程问题 4/体验问题"),
 			@ApiImplicitParam(name = "userFeedback.comment", value = "反馈描述"),
 			@ApiImplicitParam(name = "userFeedback.contact", value = "反馈图片"),
-	})
+	})*/
 	public Result<UserFeedback> add(@RequestBody UserFeedback userFeedback) {
 		Result<UserFeedback> result = new Result<UserFeedback>();
+		User user = (User) SecurityUtils.getSubject().getPrincipal();
+		userFeedback.setUid(user.getId());
 		try {
 			userFeedbackService.save(userFeedback);
 			result.success("添加成功！");

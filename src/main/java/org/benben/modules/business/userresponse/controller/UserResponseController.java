@@ -34,9 +34,9 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 用户反馈表
+ * @Description: 用户回复表管理
  * @author： jeecg-boot
- * @date：   2019-05-23
+ * @date：   2019-06-11
  * @version： V1.0
  */
 @RestController
@@ -190,9 +190,9 @@ public class UserResponseController {
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<UserResponse> pageList = userResponseService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "用户反馈表列表");
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户回复表管理列表");
       mv.addObject(NormalExcelConstants.CLASS, UserResponse.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户反馈表列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户回复表管理列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
