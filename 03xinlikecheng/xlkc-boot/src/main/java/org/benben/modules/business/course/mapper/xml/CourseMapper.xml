@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.benben.modules.business.course.mapper.CourseMapper">
+
+    <select id="queryByName" resultType="org.benben.modules.business.course.vo.CourseVo">
+      	select * from bb_course where course_name like '%${name}%' limit #{pageNumber},#{pageSize}
+    </select>
+    <select id="queryByNameAll" resultType="java.lang.Integer">
+        select count(1) from bb_course where course_name like '%${name}%'
+    </select>
+</mapper>
