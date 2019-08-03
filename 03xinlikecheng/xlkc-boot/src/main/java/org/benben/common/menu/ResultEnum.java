@@ -7,11 +7,14 @@ public enum ResultEnum {
 
 
     OPERATION_SUCCESS(1, "操作成功"),
+    OPERATION_CORRECT(1, "操作正确"),
+    OPERATION_MISTAKE(0, "操作错误"),
     OPERATION_ERROR(0, "查询为空"),
 
     OPERATION_FAIL(0,"操作失败"),
     VERIFY_SUCCESS(1,"验证码正确"),
     VERIFY_FAIL(0,"验证码错误"),
+    YAOQINGMA_FAIL(0,"邀请码码错误"),
 
     QUERY_NOT_EXIST(1,"查询不存在"),
 
@@ -27,6 +30,8 @@ public enum ResultEnum {
     //    PASSWORD_ERROR(306,"密码错误"),
 //    PASSWORD_RIGHT(307,"密码正确"),
     MOBILE_NOT_EXIST(0,"手机不存在"),
+    MOBILE1_NOT_EXIST(1,"手机不存在"),
+    MOBILE1_EXIST(0,"手机已存在"),
     MOBILE_EXIST(1,"手机已存在"),
     /**
      * 权限不足 返回code 值范围
