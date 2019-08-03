@@ -15,11 +15,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.SecurityUtils;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.video.entity.Video;
 import org.benben.modules.business.video.service.IVideoService;
 
@@ -62,8 +64,8 @@ public class RestVideoController {
 	 @PostMapping("/queryVideo")
 	 @ApiOperation(value = "已经输入过邀请码视频接口", tags = "学习园地接口", notes = "已经输入过邀请码视频接口")
 	 public RestResponseBean queryVideo() {
-
-		 List<VideoVo> videos = videoService.queryVideo();
+		 User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+		 List<VideoVo> videos = videoService.queryVideo(user1.getId());
 		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
 	 }
 
@@ -73,12 +75,14 @@ public class RestVideoController {
 			 @ApiImplicitParam(name = "invitecode",value = "邀请码"),
 	 })
 	 public RestResponseBean queryByInvitecode(@RequestParam String invitecode) {
+		 User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+
 		if (!StringUtils.isNotBlank(invitecode)) {
 			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
-		 List<Video> videos = videoService.queryByTypeAndInvitecode(invitecode);
-		if (videos == null) {
-			return new RestResponseBean(ResultEnum.VERIFY_FAIL.getValue(),ResultEnum.VERIFY_FAIL.getDesc(),"邀请码不存在");
+		 List<Video> videos = videoService.queryByTypeAndInvitecode(invitecode,user1.getId());
+		if (videos.size() == 0) {
+			return new RestResponseBean(ResultEnum.YAOQINGMA_FAIL.getValue(),ResultEnum.YAOQINGMA_FAIL.getDesc(),"邀请码不存在");
 		}
 		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
 	 }
@@ -86,7 +90,9 @@ public class RestVideoController {
 	 @PostMapping("/videoByVideotype")
 	 @ApiOperation(value = "根据类型得到视频接口", tags = "学习园地接口", notes = "根据类型得到视频接口")
 	 public  RestResponseBean queryByVideotype(@RequestParam String parentId) {
-	 	List<Video> videos = videoService.queryByVidoetype(parentId);
+		 User user1 = (User) SecurityUtils.getSubject().getPrincipal();
+
+		 List<Video> videos = videoService.queryByVidoetype(parentId,user1.getId());
 	 	return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),videos);
 	 }
 

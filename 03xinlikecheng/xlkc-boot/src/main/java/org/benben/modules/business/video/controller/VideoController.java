@@ -8,9 +8,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.bbuservideo.entity.BbUserVideo;
+import org.benben.modules.business.bbuservideo.entity.BbVideoType;
+import org.benben.modules.business.bbuservideo.service.IBbUserVideoService;
+import org.benben.modules.business.bbuservideo.service.IBbVideoTypeService;
+import org.benben.modules.business.user.entity.User;
+import org.benben.modules.business.user.service.IUserService;
 import org.benben.modules.business.video.entity.Video;
 import org.benben.modules.business.video.service.IVideoService;
 
@@ -45,7 +54,16 @@ import com.alibaba.fastjson.JSON;
 public class VideoController {
 	@Autowired
 	private IVideoService videoService;
-	
+
+	@Autowired
+	private IBbVideoTypeService videoTypeService;
+
+	@Autowired
+	private IBbUserVideoService bbUserVideoService;
+
+	@Autowired
+	private IUserService userService;
+
 	/**
 	  * 分页列表查询
 	 * @param video
@@ -55,6 +73,7 @@ public class VideoController {
 	 * @return
 	 */
 	@GetMapping(value = "/list")
+//	@ApiOperation(value = "xainsh", tags = "ton")
 	public Result<IPage<Video>> queryPageList(Video video,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -63,11 +82,16 @@ public class VideoController {
 		QueryWrapper<Video> queryWrapper = QueryGenerator.initQueryWrapper(video, req.getParameterMap());
 		Page<Video> page = new Page<Video>(pageNo, pageSize);
 		IPage<Video> pageList = videoService.page(page, queryWrapper);
+//		pageList.getRecords().get(0).
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
 	}
-	
+
+	public static void main(String[] args) {
+
+	}
+
 	/**
 	  *   添加
 	 * @param video
@@ -77,6 +101,76 @@ public class VideoController {
 	public Result<Video> add(@RequestBody Video video) {
 		Result<Video> result = new Result<Video>();
 		try {
+
+
+
+
+			//首先添加到是否收费视频上面
+			BbVideoType videoType = new BbVideoType();
+			if (video.getVideoClass() == 1) {
+				videoType.setInvitecode(video.getInvitecode());
+				videoType.setVideoClass(video.getVideoClass());
+				videoType.setVideoType(video.getVideoType());
+				videoTypeService.save(videoType);
+			}
+			if (StringUtils.isNotBlank(videoType.getId())) {
+				video.setParentid(videoType.getId());
+			}
+			videoService.save(video);
+			//添加的是收费视频的时候全部添加进我的收费视频当中
+			//查询全部的用户信息
+			List<String> list = userService.queryAll();
+			if(video.getVideoClass() == 1 && StringUtils.isNotBlank(videoType.getId())) {
+				for (String s : list) {
+					BbUserVideo userVideo = new BbUserVideo();
+					userVideo.setVid(videoType.getId());
+					userVideo.setUid(s);
+					userVideo.setState(1);
+					bbUserVideoService.save(userVideo);
+				}
+			}
+			result.success("添加成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.info(e.getMessage());
+			result.error500("操作失败");
+		}
+		return result;
+	}
+	@PostMapping(value = "/adds")
+//	@ApiOperation(value = "添加信息",tags = "实验接口 ")
+	public Result<Video> adds(@RequestBody Video video) {
+		Result<Video> result = new Result<Video>();
+		try {
+
+			if (StringUtils.isNotBlank(video.getVideoType())) {
+				//查询书籍名称是否存在
+				BbVideoType bbVideoType1 = videoTypeService.queryByName(video.getVideoType());
+				if (bbVideoType1 == null) {
+					//添加书籍名称
+					BbVideoType bbVideoType = new BbVideoType();
+					bbVideoType.setVideoType(video.getVideoType());
+					bbVideoType.setVideoClass(video.getVideoClass());
+					bbVideoType.setInvitecode(video.getInvitecode());
+					videoTypeService.save(bbVideoType);
+
+					BbVideoType bbVideoType2 = videoTypeService.queryByName(video.getVideoType());
+					String vtid = bbVideoType2.getId();
+					video.setParentid(vtid);
+					List<String> uids = userService.queryAll();
+					for (int i = 0; i < uids.size(); i++) {
+						BbUserVideo bbUserVideo = new BbUserVideo();
+						bbUserVideo.setVid(vtid);
+						bbUserVideo.setUid(uids.get(i));
+						bbUserVideo.setState(1);
+						bbUserVideoService.save(bbUserVideo);
+					}
+				} else {
+					video.setParentid(bbVideoType1.getId());
+				}
+			}
+
+
 			videoService.save(video);
 			result.success("添加成功！");
 		} catch (Exception e) {
@@ -86,7 +180,7 @@ public class VideoController {
 		}
 		return result;
 	}
-	
+
 	/**
 	  *  编辑
 	 * @param video
