@@ -5,7 +5,6 @@
     <select id="queryByName" resultType="org.benben.modules.business.books.vo.BookVo">
         select * from bb_books where name like '%${name}%' limit #{pageNumber},#{pageSize}
     </select>
-    <select id="queryByNameAll" resultType="java.lang.Integer">
-        select count(*) from bb_books where name like '%${name}%'
-    </select>
+  <!--  <select id="queryByNameAll" resultType="java.lang.Integer">
+    </select>-->
 </mapper>

@@ -22,4 +22,7 @@ public class BookVo {
 	/**购买人数*/
 	@Excel(name = "购买人数", width = 15)
 	private java.lang.Integer num;
+	/**书籍图片地址*/
+	@Excel(name = "书籍图片地址", width = 15)
+	private java.lang.String bookUrl;
 }
