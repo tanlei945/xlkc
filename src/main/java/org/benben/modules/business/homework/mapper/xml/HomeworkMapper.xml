@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.benben.modules.business.homework.mapper.HomeworkMapper">
 
-    <select id="queryByUidAndCourseId" resultType="org.benben.modules.business.homework.entity.Homework">
-      SELECT * from bb_homework where user_id=#{uid} AND course_id=#{courseId}
+    <select id="queryByUidAndCourseId" resultType="org.benben.modules.business.homework.vo.HomeWorkVo">
+      SELECT * from bb_homework where user_id=#{uid}
     </select>
 </mapper>

@@ -28,6 +28,11 @@ public class DeliveryaddressServiceImpl extends ServiceImpl<DeliveryaddressMappe
 	@Override
 	public DeliveryaddresVo listPage(Integer pageNumber, Integer pageSize) {
 		List<Deliveryaddress> deliveryaddresVos = deliveryaddressMapper.queryBooks(pageNumber, pageSize);
+		for (int i = 0; i < deliveryaddresVos.size(); i++) {
+			if (deliveryaddresVos.get(i).getState() == 0) {
+
+			}
+		}
 		Integer total = deliveryaddressMapper.queryAll();
 		if (total == null){
 			total = 0;
@@ -36,5 +41,19 @@ public class DeliveryaddressServiceImpl extends ServiceImpl<DeliveryaddressMappe
 		deliveryaddresVos1.setDeliveryaddress(deliveryaddresVos);
 		deliveryaddresVos1.setTotal(total);
 		return deliveryaddresVos1;
+	}
+
+	/**
+	 * 查找默认地址的编号
+	 * @return
+	 */
+	@Override
+	public Deliveryaddress queryByState() {
+		return deliveryaddressMapper.queryByState();
+	}
+
+	@Override
+	public List<Deliveryaddress> getAddress() {
+		return deliveryaddressMapper.getAddress();
 	}
 }

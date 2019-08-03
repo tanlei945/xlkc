@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
@@ -44,19 +46,32 @@ import java.util.Map;
 */
 @RestController
 @RequestMapping("/api/v1/deliveryaddress")
+@Api(tags = {"书店接口"})
 @Slf4j
 public class RestDeliveryaddressController {
    @Autowired
    private IDeliveryaddressService deliveryaddressService;
 
+	/**
+	 * showdoc
+	 * @catalog 书店接口
+	 * @title 分页显示全部收货地址
+	 * @description 分页显示全部收货地址接口
+	 * @method Get
+	 * @url https://192.168.1.125:8081/xlkc-boot/api/v1/deliveryaddress/listPage
+	 * @param pageNumber Integer 分页从第几个开始
+	 * @param pageSize Integer 一页显示几条数据
+	 * @return {"code": 1,"msg": "操作成功","time": "1562204862998","data": {"total": 1,"deliveryaddress": [{ 	"id": "1", 	"name": "张三", 	"phone": "1821524545", 	"address": "河南省 郑州市 二七区 大学路", 	"state": 1, 	"createTime": "2019-05-24 10:31:19", 	"createBy": "boot", 	"updateTime": null, 	"updateBy": null}]}}
+	 * @remark 书店接口
+	 * @number 99
+	 **/
    @GetMapping("/listPage")
    @ApiOperation(value = "分页显示全部收货地址", tags = {"书店接口"}, notes = "分页显示全部收货地址")
    public RestResponseBean  listPage(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
 
    		if (pageNumber != null && pageSize != null) {
 			DeliveryaddresVo deliveryaddresVo = deliveryaddressService.listPage(pageNumber, pageSize);
-			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(),
-					deliveryaddresVo);
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), deliveryaddresVo);
 		} else{
    			return new RestResponseBean(ResultEnum.QUERY_NOT_EXIST.getValue(),ResultEnum.QUERY_NOT_EXIST.getDesc(),null);
 		}
@@ -84,47 +99,84 @@ public class RestDeliveryaddressController {
 	   return result;
    }
 
-   /**
-	 *   添加
-	* @param deliveryaddress
-	* @return
-	*/
+	/**
+	 * showdoc
+	 * @catalog 书店接口
+	 * @title 添加收货地址
+	 * @description 添加收货地址接口
+	 * @method Post
+	 * @url https://192.168.1.125:8081/xlkc-boot/api/v1/deliveryaddress/add
+	 * @param address String 地址
+	 * @param name String 收货人名称
+	 * @param phone String 联系电话
+	 * @param state Integer 0/不是默认地址，1/默认地址
+	 * @return {"code": 1,"msg": "操作成功","time": "1562229972433","data": "添加成功"}
+	 * @remark 书店接口
+	 * @number 99
+	 **/
    @PostMapping(value = "/add")
    @ApiOperation(value = "添加收货地址", tags = {"书店接口"}, notes = "添加收货地址")
-   public Result<Deliveryaddress> add(@RequestBody Deliveryaddress deliveryaddress) {
+   public RestResponseBean add(@RequestBody Deliveryaddress deliveryaddress) {
 	   Result<Deliveryaddress> result = new Result<Deliveryaddress>();
+	   if (deliveryaddress.getState() == 1) {
+		   Deliveryaddress deliveryaddress1 = deliveryaddressService.queryByState();
+		   if(deliveryaddress1 != null) {
+			   deliveryaddress1.setState(0);
+			   deliveryaddressService.updateById(deliveryaddress1);
+		   }
+	   }
 	   try {
 		   deliveryaddressService.save(deliveryaddress);
-		   result.success("添加成功！");
+		   return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"添加成功");
 	   } catch (Exception e) {
 		   e.printStackTrace();
 		   log.info(e.getMessage());
 		   result.error500("操作失败");
 	   }
-	   return result;
+	   return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"添加成功");
    }
 
-   /**
-	 *  编辑
-	* @param deliveryaddress
-	* @return
-	*/
-   @PutMapping(value = "/edit")
+	/**
+	 * showdoc
+	 * @catalog 书店接口
+	 * @title 修改收货地址
+	 * @description 修改收货地址接口
+	 * @method Post
+	 * @url https://192.168.1.125:8081/xlkc-boot/api/v1/deliveryaddress/edit
+	 * @param address String 地址
+	 * @param name String 收货人名称
+	 * @param phone String 联系电话
+	 * @param state Integer 0/不是默认地址，1/默认地址
+	 * @return {"code": 1,"msg": "操作成功","time": "1562229972433","data": "修改成功"}
+	 * @remark 书店接口
+	 * @number 99
+	 **/
+   @PostMapping(value = "/edit")
    @ApiOperation(value = "修改收货地址", tags = {"书店接口"}, notes = "修改收货地址")
-   public Result<Deliveryaddress> edit(@RequestBody Deliveryaddress deliveryaddress) {
+   public RestResponseBean edit(@RequestBody Deliveryaddress deliveryaddress) {
 	   Result<Deliveryaddress> result = new Result<Deliveryaddress>();
 	   Deliveryaddress deliveryaddressEntity = deliveryaddressService.getById(deliveryaddress.getId());
-	   if(deliveryaddressEntity==null) {
-		   result.error500("未找到对应实体");
-	   }else {
-		   boolean ok = deliveryaddressService.updateById(deliveryaddress);
-		   //TODO 返回false说明什么？
-		   if(ok) {
-			   result.success("修改成功!");
+	   if (deliveryaddress.getState() == 1) {
+		   Deliveryaddress deliveryaddress1 = deliveryaddressService.queryByState();
+		   if(deliveryaddress1 != null) {
+			   deliveryaddress1.setState(0);
+			   deliveryaddressService.updateById(deliveryaddress1);
 		   }
 	   }
 
-	   return result;
+	   if(deliveryaddressEntity==null) {
+		   return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"未找到对应实体");
+	   }else {
+		   boolean ok = deliveryaddressService.updateById(deliveryaddress);
+
+		   //TODO 返回false说明什么？
+		   if(ok) {
+			   result.success("修改成功!");
+			   return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"修改成功");
+		   }
+	   }
+	   return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"修改失败");
+
    }
 
    /**
@@ -132,7 +184,8 @@ public class RestDeliveryaddressController {
 	* @param id
 	* @return
 	*/
-   @DeleteMapping(value = "/delete")
+   @PostMapping(value = "/delete")
+   @ApiOperation(value = "删除收货地址",tags = {"书店接口"},notes = "删除收货地址")
    public Result<Deliveryaddress> delete(@RequestParam(name="id",required=true) String id) {
 	   Result<Deliveryaddress> result = new Result<Deliveryaddress>();
 	   Deliveryaddress deliveryaddress = deliveryaddressService.getById(id);
