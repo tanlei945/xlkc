@@ -1,4 +1,4 @@
-package org.benben.modules.business.userposts.controller;
+package org.benben.modules.business.userwallet.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.userposts.entity.Posts;
-import org.benben.modules.business.userposts.service.IPostsService;
+import org.benben.modules.business.user.entity.User;
+import org.benben.modules.business.user.service.IUserService;
+import org.benben.modules.business.userwallet.entity.UserWallet;
+import org.benben.modules.business.userwallet.service.IUserWalletService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,35 +36,42 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 帖子表的管理
+ * @Description: 用户钱包管理
  * @author： jeecg-boot
- * @date：   2019-05-23
+ * @date：   2019-07-08
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/userposts/posts")
+@RequestMapping("/userwallet/userWallet")
 @Slf4j
-public class PostsController {
+public class UserWalletController {
 	@Autowired
-	private IPostsService postsService;
-	
+	private IUserWalletService userWalletService;
+	@Autowired
+	private IUserService userService;
+
 	/**
 	  * 分页列表查询
-	 * @param posts
+	 * @param userWallet
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Posts>> queryPageList(Posts posts,
+	public Result<IPage<UserWallet>> queryPageList(UserWallet userWallet,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Posts>> result = new Result<IPage<Posts>>();
-		QueryWrapper<Posts> queryWrapper = QueryGenerator.initQueryWrapper(posts, req.getParameterMap());
-		Page<Posts> page = new Page<Posts>(pageNo, pageSize);
-		IPage<Posts> pageList = postsService.page(page, queryWrapper);
+		Result<IPage<UserWallet>> result = new Result<IPage<UserWallet>>();
+		QueryWrapper<UserWallet> queryWrapper = QueryGenerator.initQueryWrapper(userWallet, req.getParameterMap());
+		Page<UserWallet> page = new Page<UserWallet>(pageNo, pageSize);
+		IPage<UserWallet> pageList = userWalletService.page(page, queryWrapper);
+		List<UserWallet> records = pageList.getRecords();
+		for (UserWallet record : records) {
+			User user = userService.getById(record.getUserId());
+			record.setNickName(user.getNickname());
+		}
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -70,14 +79,14 @@ public class PostsController {
 	
 	/**
 	  *   添加
-	 * @param posts
+	 * @param userWallet
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<Posts> add(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
+	public Result<UserWallet> add(@RequestBody UserWallet userWallet) {
+		Result<UserWallet> result = new Result<UserWallet>();
 		try {
-			postsService.save(posts);
+			userWalletService.save(userWallet);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,17 +98,17 @@ public class PostsController {
 	
 	/**
 	  *  编辑
-	 * @param posts
+	 * @param userWallet
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Posts> edit(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
-		Posts postsEntity = postsService.getById(posts.getId());
-		if(postsEntity==null) {
+	public Result<UserWallet> edit(@RequestBody UserWallet userWallet) {
+		Result<UserWallet> result = new Result<UserWallet>();
+		UserWallet userWalletEntity = userWalletService.getById(userWallet.getId());
+		if(userWalletEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.updateById(posts);
+			boolean ok = userWalletService.updateById(userWallet);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -115,13 +124,13 @@ public class PostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Posts> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserWallet> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserWallet> result = new Result<UserWallet>();
+		UserWallet userWallet = userWalletService.getById(id);
+		if(userWallet==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.removeById(id);
+			boolean ok = userWalletService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -136,12 +145,12 @@ public class PostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Posts> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Posts> result = new Result<Posts>();
+	public Result<UserWallet> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserWallet> result = new Result<UserWallet>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.postsService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userWalletService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -153,13 +162,13 @@ public class PostsController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<Posts> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserWallet> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserWallet> result = new Result<UserWallet>();
+		UserWallet userWallet = userWalletService.getById(id);
+		if(userWallet==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(posts);
+			result.setResult(userWallet);
 			result.setSuccess(true);
 		}
 		return result;
@@ -174,13 +183,13 @@ public class PostsController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Posts> queryWrapper = null;
+      QueryWrapper<UserWallet> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Posts posts = JSON.parseObject(deString, Posts.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(posts, request.getParameterMap());
+              UserWallet userWallet = JSON.parseObject(deString, UserWallet.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userWallet, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -188,11 +197,11 @@ public class PostsController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Posts> pageList = postsService.list(queryWrapper);
+      List<UserWallet> pageList = userWalletService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "帖子表的管理列表");
-      mv.addObject(NormalExcelConstants.CLASS, Posts.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("帖子表的管理列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户钱包管理列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserWallet.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户钱包管理列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -215,11 +224,11 @@ public class PostsController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Posts> listPostss = ExcelImportUtil.importExcel(file.getInputStream(), Posts.class, params);
-              for (Posts postsExcel : listPostss) {
-                  postsService.save(postsExcel);
+              List<UserWallet> listUserWallets = ExcelImportUtil.importExcel(file.getInputStream(), UserWallet.class, params);
+              for (UserWallet userWalletExcel : listUserWallets) {
+                  userWalletService.save(userWalletExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listPostss.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserWallets.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

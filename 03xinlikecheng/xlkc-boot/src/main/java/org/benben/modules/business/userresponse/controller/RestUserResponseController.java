@@ -9,10 +9,22 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.SecurityUtils;
+import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
+import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.user.entity.User;
+import org.benben.modules.business.user.service.IUserService;
+import org.benben.modules.business.userevaluate.entity.UserEvaluate;
+import org.benben.modules.business.userevaluate.service.IUserEvaluateService;
+import org.benben.modules.business.usermessage.entity.UserMessage;
+import org.benben.modules.business.usermessage.service.IUserMessageService;
+import org.benben.modules.business.userposts.entity.UserPosts;
+import org.benben.modules.business.userposts.service.IUserPostsService;
 import org.benben.modules.business.userresponse.entity.UserResponse;
 import org.benben.modules.business.userresponse.service.IUserResponseService;
 
@@ -34,7 +46,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import com.alibaba.fastjson.JSON;
 
- /**
+/**
  * @Title: Controller
  * @Description: 用户反馈表管理
  * @author： jeecg-boot
@@ -43,13 +55,23 @@ import com.alibaba.fastjson.JSON;
  */
 @RestController
 @RequestMapping("/api/v1/userResponse")
+@Api(tags = {"用户评论接口"})
 @Slf4j
 public class RestUserResponseController {
 	@Autowired
 	private IUserResponseService userResponseService;
-	
+
+	@Autowired
+	private IUserMessageService userMessageService;
+
+	@Autowired
+	private IUserPostsService userPostsService;
+
+	@Autowired
+	private IUserEvaluateService userEvaluateService;
+
 	/**
-	  * 分页列表查询
+	 * 分页列表查询
 	 * @param userResponse
 	 * @param pageNo
 	 * @param pageSize
@@ -58,9 +80,9 @@ public class RestUserResponseController {
 	 */
 	@GetMapping(value = "/list")
 	public Result<IPage<UserResponse>> queryPageList(UserResponse userResponse,
-									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-									  HttpServletRequest req) {
+			@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+			@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+			HttpServletRequest req) {
 		Result<IPage<UserResponse>> result = new Result<IPage<UserResponse>>();
 		QueryWrapper<UserResponse> queryWrapper = QueryGenerator.initQueryWrapper(userResponse, req.getParameterMap());
 		Page<UserResponse> page = new Page<UserResponse>(pageNo, pageSize);
@@ -69,28 +91,55 @@ public class RestUserResponseController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+
 	/**
-	  *   添加
+	 *   添加
 	 * @param userResponse
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<UserResponse> add(@RequestBody UserResponse userResponse) {
+	@ApiOperation(value = "添加回复内容", tags = {"用户评论接口"}, notes = "添加回复内容")
+	public RestResponseBean add(@RequestBody UserResponse userResponse) {
 		Result<UserResponse> result = new Result<UserResponse>();
+		User user = (User) SecurityUtils.getSubject().getPrincipal();
+		userResponse.setEvaluateUserId(user.getId());
+
+		userResponseService.save(userResponse);
+
+		//把评论信息添加到我的评论当中
+		UserMessage userMessage = new UserMessage();
+
+		//添加返回用戶id
+		userMessage.setResponseId(userResponse.getId());
+		//添加评论用户id
+		userMessage.setEvaluateId(userResponse.getEvaluateId());
+
+		//通过回复的用户得到帖子id
+		UserEvaluate userEvaluate = userEvaluateService.getById(userResponse.getEvaluateId());
+
+		//得到被点赞的帖子的那个用户
+		UserPosts userPosts = userPostsService.getByPostId(userEvaluate.getPostsId());
+		if (userPosts != null) {
+			userMessage.setPostsId(userEvaluate.getPostsId());
+			userMessage.setUserId(userPosts.getUserId());
+			userMessage.setState(2);
+		}
+
+		userMessageService.save(userMessage);
+
 		try {
-			userResponseService.save(userResponse);
 			result.success("添加成功！");
+			return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"添加成功");
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
 			result.error500("操作失败");
+			return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"操作失败");
 		}
-		return result;
 	}
-	
+
 	/**
-	  *  编辑
+	 *  编辑
 	 * @param userResponse
 	 * @return
 	 */
@@ -107,12 +156,12 @@ public class RestUserResponseController {
 				result.success("修改成功!");
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	  *   通过id删除
+	 *   通过id删除
 	 * @param id
 	 * @return
 	 */
@@ -128,12 +177,12 @@ public class RestUserResponseController {
 				result.success("删除成功!");
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
-	  *  批量删除
+	 *  批量删除
 	 * @param ids
 	 * @return
 	 */
@@ -148,9 +197,9 @@ public class RestUserResponseController {
 		}
 		return result;
 	}
-	
+
 	/**
-	  * 通过id查询
+	 * 通过id查询
 	 * @param id
 	 * @return
 	 */
@@ -167,73 +216,73 @@ public class RestUserResponseController {
 		return result;
 	}
 
-  /**
-      * 导出excel
-   *
-   * @param request
-   * @param response
-   */
-  @RequestMapping(value = "/exportXls")
-  public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
-      // Step.1 组装查询条件
-      QueryWrapper<UserResponse> queryWrapper = null;
-      try {
-          String paramsStr = request.getParameter("paramsStr");
-          if (oConvertUtils.isNotEmpty(paramsStr)) {
-              String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              UserResponse userResponse = JSON.parseObject(deString, UserResponse.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(userResponse, request.getParameterMap());
-          }
-      } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-      }
+	/**
+	 * 导出excel
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/exportXls")
+	public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+		// Step.1 组装查询条件
+		QueryWrapper<UserResponse> queryWrapper = null;
+		try {
+			String paramsStr = request.getParameter("paramsStr");
+			if (oConvertUtils.isNotEmpty(paramsStr)) {
+				String deString = URLDecoder.decode(paramsStr, "UTF-8");
+				UserResponse userResponse = JSON.parseObject(deString, UserResponse.class);
+				queryWrapper = QueryGenerator.initQueryWrapper(userResponse, request.getParameterMap());
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 
-      //Step.2 AutoPoi 导出Excel
-      ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<UserResponse> pageList = userResponseService.list(queryWrapper);
-      //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "用户反馈表管理列表");
-      mv.addObject(NormalExcelConstants.CLASS, UserResponse.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户反馈表管理列表数据", "导出人:Jeecg", "导出信息"));
-      mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
-      return mv;
-  }
+		//Step.2 AutoPoi 导出Excel
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+		List<UserResponse> pageList = userResponseService.list(queryWrapper);
+		//导出文件名称
+		mv.addObject(NormalExcelConstants.FILE_NAME, "用户反馈表管理列表");
+		mv.addObject(NormalExcelConstants.CLASS, UserResponse.class);
+		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户反馈表管理列表数据", "导出人:Jeecg", "导出信息"));
+		mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
+		return mv;
+	}
 
-  /**
-      * 通过excel导入数据
-   *
-   * @param request
-   * @param response
-   * @return
-   */
-  @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-  public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-      MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-      Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
-      for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
-          MultipartFile file = entity.getValue();// 获取上传文件对象
-          ImportParams params = new ImportParams();
-          params.setTitleRows(2);
-          params.setHeadRows(1);
-          params.setNeedSave(true);
-          try {
-              List<UserResponse> listUserResponses = ExcelImportUtil.importExcel(file.getInputStream(), UserResponse.class, params);
-              for (UserResponse userResponseExcel : listUserResponses) {
-                  userResponseService.save(userResponseExcel);
-              }
-              return Result.ok("文件导入成功！数据行数：" + listUserResponses.size());
-          } catch (Exception e) {
-              log.error(e.getMessage());
-              return Result.error("文件导入失败！");
-          } finally {
-              try {
-                  file.getInputStream().close();
-              } catch (IOException e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-      return Result.ok("文件导入失败！");
-  }
+	/**
+	 * 通过excel导入数据
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+	public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+		for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
+			MultipartFile file = entity.getValue();// 获取上传文件对象
+			ImportParams params = new ImportParams();
+			params.setTitleRows(2);
+			params.setHeadRows(1);
+			params.setNeedSave(true);
+			try {
+				List<UserResponse> listUserResponses = ExcelImportUtil.importExcel(file.getInputStream(), UserResponse.class, params);
+				for (UserResponse userResponseExcel : listUserResponses) {
+					userResponseService.save(userResponseExcel);
+				}
+				return Result.ok("文件导入成功！数据行数：" + listUserResponses.size());
+			} catch (Exception e) {
+				log.error(e.getMessage());
+				return Result.error("文件导入失败！");
+			} finally {
+				try {
+					file.getInputStream().close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return Result.ok("文件导入失败！");
+	}
 
 }

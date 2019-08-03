@@ -3,6 +3,7 @@ package org.benben.modules.business.usermessage.entity;
 import java.io.Serializable;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -26,10 +27,10 @@ public class UserMessage implements Serializable {
 	private java.lang.String id;
 	/**点赞用户id*/
 	@Excel(name = "点赞用户id", width = 15)
-	private java.lang.String user2Id;
+	private java.lang.String userLikeId;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
-	private java.lang.String user1Id;
+	private java.lang.String userId;
 	/**评论id*/
 	@Excel(name = "评论id", width = 15)
 	private java.lang.String evaluateId;
@@ -39,10 +40,14 @@ public class UserMessage implements Serializable {
 	/**和帖子相关联id*/
 	@Excel(name = "和帖子相关联id", width = 15)
 	private java.lang.String postsId;
+	//0/是未读，1/是已读
+	private java.lang.Integer type;
 	/**0/赞同的消息 1/评论的消息 2/普通消息*/
 	@Excel(name = "0/赞同的消息 1/评论的消息 2/普通消息", width = 15)
 	private java.lang.Integer state;
 	/**消息的描述*/
+	@Excel(name = "消息的描述", width = 15)
+	private java.lang.String systemName;
 	@Excel(name = "消息的描述", width = 15)
 	private java.lang.String comment;
 	/**创建时间*/
@@ -61,4 +66,6 @@ public class UserMessage implements Serializable {
 	/**修改人*/
 	@Excel(name = "修改人", width = 15)
 	private java.lang.String updateBy;
+	@TableField(exist = false)
+	private String nickname;
 }

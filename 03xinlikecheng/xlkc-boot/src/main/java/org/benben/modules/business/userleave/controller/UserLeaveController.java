@@ -1,4 +1,4 @@
-package org.benben.modules.business.userposts.controller;
+package org.benben.modules.business.userleave.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.userposts.entity.Posts;
-import org.benben.modules.business.userposts.service.IPostsService;
+import org.benben.modules.business.userleave.entity.UserLeave;
+import org.benben.modules.business.userleave.service.IUserLeaveService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,35 +34,35 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 关于帖子
+ * @Description: 用户请假
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-06-03
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/posts")
+@RequestMapping("/userleave/userLeave")
 @Slf4j
-public class RestPostsController {
+public class UserLeaveController {
 	@Autowired
-	private IPostsService postsService;
+	private IUserLeaveService userLeaveService;
 	
 	/**
 	  * 分页列表查询
-	 * @param posts
+	 * @param userLeave
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Posts>> queryPageList(Posts posts,
+	public Result<IPage<UserLeave>> queryPageList(UserLeave userLeave,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Posts>> result = new Result<IPage<Posts>>();
-		QueryWrapper<Posts> queryWrapper = QueryGenerator.initQueryWrapper(posts, req.getParameterMap());
-		Page<Posts> page = new Page<Posts>(pageNo, pageSize);
-		IPage<Posts> pageList = postsService.page(page, queryWrapper);
+		Result<IPage<UserLeave>> result = new Result<IPage<UserLeave>>();
+		QueryWrapper<UserLeave> queryWrapper = QueryGenerator.initQueryWrapper(userLeave, req.getParameterMap());
+		Page<UserLeave> page = new Page<UserLeave>(pageNo, pageSize);
+		IPage<UserLeave> pageList = userLeaveService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -70,14 +70,14 @@ public class RestPostsController {
 	
 	/**
 	  *   添加
-	 * @param posts
+	 * @param userLeave
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<Posts> add(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
+	public Result<UserLeave> add(@RequestBody UserLeave userLeave) {
+		Result<UserLeave> result = new Result<UserLeave>();
 		try {
-			postsService.save(posts);
+			userLeaveService.save(userLeave);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,17 +89,17 @@ public class RestPostsController {
 	
 	/**
 	  *  编辑
-	 * @param posts
+	 * @param userLeave
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Posts> edit(@RequestBody Posts posts) {
-		Result<Posts> result = new Result<Posts>();
-		Posts postsEntity = postsService.getById(posts.getId());
-		if(postsEntity==null) {
+	public Result<UserLeave> edit(@RequestBody UserLeave userLeave) {
+		Result<UserLeave> result = new Result<UserLeave>();
+		UserLeave userLeaveEntity = userLeaveService.getById(userLeave.getId());
+		if(userLeaveEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.updateById(posts);
+			boolean ok = userLeaveService.updateById(userLeave);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -115,13 +115,13 @@ public class RestPostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Posts> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserLeave> delete(@RequestParam(name="id",required=true) String id) {
+		Result<UserLeave> result = new Result<UserLeave>();
+		UserLeave userLeave = userLeaveService.getById(id);
+		if(userLeave==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = postsService.removeById(id);
+			boolean ok = userLeaveService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -136,12 +136,12 @@ public class RestPostsController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Posts> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Posts> result = new Result<Posts>();
+	public Result<UserLeave> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserLeave> result = new Result<UserLeave>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.postsService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userLeaveService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -153,13 +153,13 @@ public class RestPostsController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<Posts> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Posts> result = new Result<Posts>();
-		Posts posts = postsService.getById(id);
-		if(posts==null) {
+	public Result<UserLeave> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserLeave> result = new Result<UserLeave>();
+		UserLeave userLeave = userLeaveService.getById(id);
+		if(userLeave==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(posts);
+			result.setResult(userLeave);
 			result.setSuccess(true);
 		}
 		return result;
@@ -174,13 +174,13 @@ public class RestPostsController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Posts> queryWrapper = null;
+      QueryWrapper<UserLeave> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Posts posts = JSON.parseObject(deString, Posts.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(posts, request.getParameterMap());
+              UserLeave userLeave = JSON.parseObject(deString, UserLeave.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userLeave, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -188,11 +188,11 @@ public class RestPostsController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Posts> pageList = postsService.list(queryWrapper);
+      List<UserLeave> pageList = userLeaveService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "关于帖子列表");
-      mv.addObject(NormalExcelConstants.CLASS, Posts.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("关于帖子列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户请假列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserLeave.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户请假列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -215,11 +215,11 @@ public class RestPostsController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Posts> listPostss = ExcelImportUtil.importExcel(file.getInputStream(), Posts.class, params);
-              for (Posts postsExcel : listPostss) {
-                  postsService.save(postsExcel);
+              List<UserLeave> listUserLeaves = ExcelImportUtil.importExcel(file.getInputStream(), UserLeave.class, params);
+              for (UserLeave userLeaveExcel : listUserLeaves) {
+                  userLeaveService.save(userLeaveExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listPostss.size());
+              return Result.ok("文件导入成功！数据行数：" + listUserLeaves.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");

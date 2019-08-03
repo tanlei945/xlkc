@@ -15,13 +15,19 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="评论人id">
-          <a-input placeholder="请输入评论人id" v-decorator="['evaluateId', {}]" />
+          <a-input placeholder="请输入评论人id" v-decorator="['evaluateUserId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="回复用户id">
           <a-input placeholder="请输入回复用户id" v-decorator="['userId', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="评论表id">
+          <a-input placeholder="请输入评论表id" v-decorator="['evaluateId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -77,7 +83,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'evaluateId','userId','comment'))
+          this.form.setFieldsValue(pick(this.model,'evaluateUserId','userId','evaluateId','comment'))
 		  //时间格式化
         });
 

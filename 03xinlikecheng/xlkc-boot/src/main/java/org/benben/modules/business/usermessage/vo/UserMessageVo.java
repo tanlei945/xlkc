@@ -21,10 +21,10 @@ public class UserMessageVo implements Serializable {
 	private java.lang.String nickname;
 	/**点赞用户id*/
 	@Excel(name = "点赞用户姓名id", width = 15)
-	private java.lang.String user2Id;
+	private java.lang.String userLikeId;
 	/**用户id*/
 	@Excel(name = "用户名称id", width = 15)
-	private java.lang.String user1Id;
+	private java.lang.String userId;
 	/**评论id*/
 	@Excel(name = "评论id", width = 15)
 	private java.lang.String evaluateId;
@@ -40,6 +40,8 @@ public class UserMessageVo implements Serializable {
 	/**消息的描述*/
 	@Excel(name = "消息的描述", width = 15)
 	private java.lang.String comment;
+	//0/是未读，1/是已读
+	private java.lang.Integer type;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

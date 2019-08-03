@@ -11,11 +11,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.SecurityUtils;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
 import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
+import org.benben.modules.business.posts.service.IPostsService;
+import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.userposts.entity.Posts;
 import org.benben.modules.business.userposts.entity.UserPosts;
 import org.benben.modules.business.userposts.service.IUserPostsService;
@@ -26,6 +29,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.benben.modules.business.userposts.vo.UserPostsVo;
+import org.benben.modules.business.userposts.vo.UserPostsVos;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -54,17 +58,22 @@ public class RestUserPostsController {
 	@Autowired
 	private IUserPostsService userPostsService;
 
-	@PostMapping("/queryByPostsid")
-	@ApiOperation(value = "根据帖子id得到帖子的详细信息",tags = "我的帖子接口",notes = "根据帖子id得到帖子的详细信息")
-	public RestResponseBean queryByPostsid(@RequestParam String postsId) {
-		Posts posts = userPostsService.queryByPostsId(postsId);
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),posts);
-	}
+	@Autowired
+	private IPostsService postsService;
 
+	 /*@PostMapping("/queryByPostsid")
+	 @ApiOperation(value = "根据帖子id得到帖子的详细信息",tags = "我的帖子接口",notes = "根据帖子id得到帖子的详细信息")
+	 public RestResponseBean queryByPostsid(@RequestParam String postsId) {
+		 Posts posts = userPostsService.queryByPostsId(postsId);
+		 return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),posts);
+	 }
+*/
 	@GetMapping("/queryUserPosts")
 	@ApiOperation(value = "展示所有我的帖子", tags = "我的帖子接口", notes = "展示所有我的帖子")
 	public RestResponseBean queryUserPosts(){
-		List<UserPostsVo> userPosts = userPostsService.queryUserPosts();
+		User user = (User) SecurityUtils.getSubject().getPrincipal();
+
+		List<UserPostsVos> userPosts = userPostsService.queryUserPosts(user.getId());
 		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),userPosts);
 	}
 
@@ -137,20 +146,24 @@ public class RestUserPostsController {
 	 * @param id
 	 * @return
 	 */
-	@DeleteMapping(value = "/delete")
-	public Result<UserPosts> delete(@RequestParam(name="id",required=true) String id) {
+	@PostMapping(value = "/delete")
+	@ApiOperation(value = "删除我的帖子", tags = "我的帖子接口", notes = "删除我的帖子")
+	public RestResponseBean delete(@RequestParam(name="id",required=true) String id) {
 		Result<UserPosts> result = new Result<UserPosts>();
 		UserPosts userPosts = userPostsService.getById(id);
 		if(userPosts==null) {
 			result.error500("未找到对应实体");
+			return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"未找到对应的实体");
 		}else {
+			//删除我的帖子的同时删除帖子
+			postsService.removeById(userPosts.getPostsId());
 			boolean ok = userPostsService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
+				return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),"删除成功");
 			}
 		}
-		
-		return result;
+		return new RestResponseBean(ResultEnum.OPERATION_FAIL.getValue(),ResultEnum.OPERATION_FAIL.getDesc(),"操作失败");
 	}
 	
 	/**
