@@ -3,6 +3,8 @@ package org.benben.modules.business.notice.service;
 import org.benben.modules.business.notice.entity.Notice;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @Description: 关于通知的管理
  * @author： jeecg-boot
@@ -11,6 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface INoticeService extends IService<Notice> {
 
-	Notice queryNotice();
+	List<Notice> queryNotice();
 
 }

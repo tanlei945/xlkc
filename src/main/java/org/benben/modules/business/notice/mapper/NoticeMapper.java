@@ -15,6 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface NoticeMapper extends BaseMapper<Notice> {
 
-	@Select("select * from bb_notice HAVING MAX(create_time)")
-	Notice queryNotice();
+	@Select("select * from bb_notice ORDER BY create_time desc")
+	List<Notice> queryNotice();
 }

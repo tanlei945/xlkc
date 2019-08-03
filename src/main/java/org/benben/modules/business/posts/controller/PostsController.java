@@ -1,4 +1,4 @@
-package org.benben.modules.business.notice.controller;
+package org.benben.modules.business.posts.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,16 +8,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
-import org.benben.common.menu.ResultEnum;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
-import org.benben.modules.business.notice.entity.Notice;
-import org.benben.modules.business.notice.service.INoticeService;
+import org.benben.modules.business.posts.entity.Posts;
+import org.benben.modules.business.posts.service.IPostsService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,55 +34,35 @@ import com.alibaba.fastjson.JSON;
 
  /**
  * @Title: Controller
- * @Description: 通知表管理
+ * @Description: 帖子的管理
  * @author： jeecg-boot
- * @date：   2019-05-22
+ * @date：   2019-06-10
  * @version： V1.0
  */
 @RestController
-@RequestMapping("/api/v1/notice")
-@Api(tags = "通知接口")
+@RequestMapping("/posts/posts")
 @Slf4j
-public class RestNoticeController {
+public class PostsController {
 	@Autowired
-	private INoticeService noticeService;
-
-
-	 /**
-	  * showdoc
-	  * @catalog 通知接口
-	  * @title 显示最新的通知
-	  * @description 显示最新的通知接口
-	  * @method Post
-	  * @url https://192.168.1.125:8081/xlkc-boot/api/v1/notice/queryNotice
-	  * @return {"code": 1,"msg": "操作成功","time": "1562220907519","data": {"id": "297e017e6ac9b6da016ac9bad1490002","comment": "各位同学NLPP课程已经结束，还有想看的同学请查看下次开课时间","createTime": "2018-03-01 23:12:12","createBy": "43243224","updateTime": "2018-03-01 23:12:11","updateBy": "43242"}}
-	  * @remark 通知接口
-	  * @number 99
-	  **/
-	@PostMapping("/queryNotice")
-	@ApiOperation(value = "显示最新的通知", tags = "通知接口", notes = "显示最新的通知")
-	public RestResponseBean queryNotice() {
-		List<Notice> notice = noticeService.queryNotice();
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),notice);
-	}
+	private IPostsService postsService;
 	
 	/**
 	  * 分页列表查询
-	 * @param notice
+	 * @param posts
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@GetMapping(value = "/list")
-	public Result<IPage<Notice>> queryPageList(Notice notice,
+	public Result<IPage<Posts>> queryPageList(Posts posts,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<Notice>> result = new Result<IPage<Notice>>();
-		QueryWrapper<Notice> queryWrapper = QueryGenerator.initQueryWrapper(notice, req.getParameterMap());
-		Page<Notice> page = new Page<Notice>(pageNo, pageSize);
-		IPage<Notice> pageList = noticeService.page(page, queryWrapper);
+		Result<IPage<Posts>> result = new Result<IPage<Posts>>();
+		QueryWrapper<Posts> queryWrapper = QueryGenerator.initQueryWrapper(posts, req.getParameterMap());
+		Page<Posts> page = new Page<Posts>(pageNo, pageSize);
+		IPage<Posts> pageList = postsService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -95,14 +70,14 @@ public class RestNoticeController {
 	
 	/**
 	  *   添加
-	 * @param notice
+	 * @param posts
 	 * @return
 	 */
 	@PostMapping(value = "/add")
-	public Result<Notice> add(@RequestBody Notice notice) {
-		Result<Notice> result = new Result<Notice>();
+	public Result<Posts> add(@RequestBody Posts posts) {
+		Result<Posts> result = new Result<Posts>();
 		try {
-			noticeService.save(notice);
+			postsService.save(posts);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -114,17 +89,17 @@ public class RestNoticeController {
 	
 	/**
 	  *  编辑
-	 * @param notice
+	 * @param posts
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-	public Result<Notice> edit(@RequestBody Notice notice) {
-		Result<Notice> result = new Result<Notice>();
-		Notice noticeEntity = noticeService.getById(notice.getId());
-		if(noticeEntity==null) {
+	public Result<Posts> edit(@RequestBody Posts posts) {
+		Result<Posts> result = new Result<Posts>();
+		Posts postsEntity = postsService.getById(posts.getId());
+		if(postsEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = noticeService.updateById(notice);
+			boolean ok = postsService.updateById(posts);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -140,13 +115,13 @@ public class RestNoticeController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/delete")
-	public Result<Notice> delete(@RequestParam(name="id",required=true) String id) {
-		Result<Notice> result = new Result<Notice>();
-		Notice notice = noticeService.getById(id);
-		if(notice==null) {
+	public Result<Posts> delete(@RequestParam(name="id",required=true) String id) {
+		Result<Posts> result = new Result<Posts>();
+		Posts posts = postsService.getById(id);
+		if(posts==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = noticeService.removeById(id);
+			boolean ok = postsService.removeById(id);
 			if(ok) {
 				result.success("删除成功!");
 			}
@@ -161,12 +136,12 @@ public class RestNoticeController {
 	 * @return
 	 */
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<Notice> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<Notice> result = new Result<Notice>();
+	public Result<Posts> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<Posts> result = new Result<Posts>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.noticeService.removeByIds(Arrays.asList(ids.split(",")));
+			this.postsService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -178,13 +153,13 @@ public class RestNoticeController {
 	 * @return
 	 */
 	@GetMapping(value = "/queryById")
-	public Result<Notice> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<Notice> result = new Result<Notice>();
-		Notice notice = noticeService.getById(id);
-		if(notice==null) {
+	public Result<Posts> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<Posts> result = new Result<Posts>();
+		Posts posts = postsService.getById(id);
+		if(posts==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(notice);
+			result.setResult(posts);
 			result.setSuccess(true);
 		}
 		return result;
@@ -199,13 +174,13 @@ public class RestNoticeController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<Notice> queryWrapper = null;
+      QueryWrapper<Posts> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              Notice notice = JSON.parseObject(deString, Notice.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(notice, request.getParameterMap());
+              Posts posts = JSON.parseObject(deString, Posts.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(posts, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -213,11 +188,11 @@ public class RestNoticeController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<Notice> pageList = noticeService.list(queryWrapper);
+      List<Posts> pageList = postsService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "通知表管理列表");
-      mv.addObject(NormalExcelConstants.CLASS, Notice.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("通知表管理列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "帖子的管理列表");
+      mv.addObject(NormalExcelConstants.CLASS, Posts.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("帖子的管理列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -240,11 +215,11 @@ public class RestNoticeController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<Notice> listNotices = ExcelImportUtil.importExcel(file.getInputStream(), Notice.class, params);
-              for (Notice noticeExcel : listNotices) {
-                  noticeService.save(noticeExcel);
+              List<Posts> listPostss = ExcelImportUtil.importExcel(file.getInputStream(), Posts.class, params);
+              for (Posts postsExcel : listPostss) {
+                  postsService.save(postsExcel);
               }
-              return Result.ok("文件导入成功！数据行数：" + listNotices.size());
+              return Result.ok("文件导入成功！数据行数：" + listPostss.size());
           } catch (Exception e) {
               log.error(e.getMessage());
               return Result.error("文件导入失败！");
