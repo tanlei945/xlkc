@@ -1,5 +1,8 @@
 package org.benben.modules.business.usercollect.service.impl;
 
+import org.benben.modules.business.posts.service.IPostsService;
+import org.benben.modules.business.recommendposts.entity.RecommendPosts;
+import org.benben.modules.business.recommendposts.service.IRecommendPostsService;
 import org.benben.modules.business.usercollect.entity.UserCollect;
 import org.benben.modules.business.usercollect.mapper.UserCollectMapper;
 import org.benben.modules.business.usercollect.service.IUserCollectService;
@@ -23,10 +26,28 @@ public class UserCollectServiceImpl extends ServiceImpl<UserCollectMapper, UserC
 
 	@Autowired
 	private UserCollectMapper collectMapper;
+	@Autowired
+	private IPostsService postsService;
+	@Autowired
+	private IRecommendPostsService recommendPostsService;
 
 	@Override
-	public List<UserCollectVo> queryUserPosts() {
-		List<UserCollectVo> userCollectVos = collectMapper.querrUserPosts();
+	public List<UserCollectVo> queryUserPosts(String uid) {
+		List<UserCollectVo> userCollectVos = collectMapper.querrUserPosts(uid);
+		for (UserCollectVo userCollectVo : userCollectVos) {
+			org.benben.modules.business.posts.entity.Posts posts = postsService.getById(userCollectVo.getPostsId());
+			if (posts != null) {
+				userCollectVo.setContent(posts.getContent());
+				userCollectVo.setIntroImg(posts.getIntroImg());
+				userCollectVo.setPostsName(posts.getPostsName());
+			} else {
+				RecommendPosts recommendPosts  = recommendPostsService.getById(userCollectVo.getPostsId());
+				userCollectVo.setPostsName(recommendPosts.getName());
+				userCollectVo.setContent(recommendPosts.getContent());
+				userCollectVo.setIntroImg(recommendPosts.getIntroImg());
+			}
+
+		}
 		return userCollectVos;
 	}
 
@@ -34,5 +55,16 @@ public class UserCollectServiceImpl extends ServiceImpl<UserCollectMapper, UserC
 	public Posts queryByPostsId(String postsId) {
 		Posts posts = collectMapper.queryByPostsId(postsId);
 		return posts;
+	}
+
+	@Override
+	public UserCollect getCollect(String postId, String uid) {
+		UserCollect collect = collectMapper.getCollect(postId,uid);
+		return collect;
+	}
+
+	@Override
+	public List<UserCollect> getPostIdCollect(String postId) {
+		return collectMapper.getPostIdCollect(postId);
 	}
 }

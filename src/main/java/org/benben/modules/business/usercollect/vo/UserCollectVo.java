@@ -22,16 +22,19 @@ public class UserCollectVo {
 	private java.lang.String postsName;
 	/**帖子内容*/
 	@Excel(name = "帖子内容", width = 15)
-	private java.lang.String comment;
+	private java.lang.String content;
 	/**图片地址*/
 	@Excel(name = "图片地址", width = 15)
-	private java.lang.String pictureUrl;
+	private java.lang.String introImg;
 	/**点赞次数*/
 	@Excel(name = "点赞次数", width = 15)
 	private java.lang.Integer liknum;
 	/**评论数*/
 	@Excel(name = "评论数", width = 15)
 	private java.lang.Integer commentNum;
+	/**1/收藏，0/取消收藏 */
+	@Excel(name = "1/收藏，0/取消收藏 ", width = 15)
+	private java.lang.Integer type;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

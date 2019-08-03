@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @Description: 普通用户
@@ -18,13 +19,13 @@ public interface IUserService extends IService<User> {
 //	 * 添加一对多
 //	 *
 //	 */
-//	public void saveMain(User user,List<UserThird> userThirdList) ;
+//	public void saveMain(UserPostsVos user,List<UserThird> userThirdList) ;
 //
 //	/**
 //	 * 修改一对多
 //	 *
 //	 */
-//	public void updateMain(User user,List<UserThird> userThirdList);
+//	public void updateMain(UserPostsVos user,List<UserThird> userThirdList);
 
 	/**
 	 * 删除一对多
@@ -45,4 +46,11 @@ public interface IUserService extends IService<User> {
 	public int forgetPassword(String mobile, String password);
 
 	User verifyUser(String chinaname, String englishname, String referrer);
+
+	String queryById(String mobile);
+
+	List<String> queryAll();
+
+	List<User> getAllUser();
+
 }

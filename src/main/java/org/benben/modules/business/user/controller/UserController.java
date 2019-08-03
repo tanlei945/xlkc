@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import io.swagger.annotations.ApiOperation;
+import org.benben.common.api.vo.RestResponseBean;
+import org.benben.common.menu.ResultEnum;
 import org.benben.common.util.PasswordUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -47,7 +49,13 @@ import com.alibaba.fastjson.JSON;
 public class UserController {
 	@Autowired
 	private IUserService userService;
-	
+
+	@GetMapping("/getAllUser")
+	public RestResponseBean getAllUser() {
+		List<User> list = userService.getAllUser();
+		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(),ResultEnum.OPERATION_SUCCESS.getDesc(),list);
+	}
+
 	/**
 	  * 分页列表查询
 	 * @param user
@@ -75,13 +83,13 @@ public class UserController {
 	 * @param user
 	 * @return
 	 */
-/*	@PostMapping(value = "/add")
+	@PostMapping(value = "/add")
 	public Result<User> add(@RequestBody User user) {
 		Result<User> result = new Result<User>();
 		try {
 			String salt = oConvertUtils.randomGen(8);
 			user.setSalt(salt);
-			String passwordEncode = PasswordUtil.encrypt(user.getUsername(), user.getPassword(), salt);
+			String passwordEncode = PasswordUtil.encrypt(user.getMobile(), user.getPassword(), salt);
 			user.setPassword(passwordEncode);
 			userService.save(user);
 			result.success("添加成功！");
@@ -92,15 +100,17 @@ public class UserController {
 		}
 		return result;
 	}
-	*/
 	/**
 	  *  编辑
 	 * @param user
 	 * @return
 	 */
 	@PutMapping(value = "/edit")
-//	@ApiOperation(value = "手机号已被注册",tags = {"用户接口"},notes = "手机号已被注册")
+//	@ApiOperation(value = "修改",tags = {"修改"},notes = "修改")
 	public Result<User> edit(@RequestBody User user) {
+		String salt = oConvertUtils.randomGen(8);
+		String password = PasswordUtil.encrypt(user.getMobile(), user.getPassword(), salt);
+		user.setPassword(password);
 		Result<User> result = new Result<User>();
 		User userEntity = userService.getById(user.getId());
 		if(userEntity==null) {

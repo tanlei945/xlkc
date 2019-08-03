@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @Description: 普通用户
@@ -32,32 +33,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	@Autowired
 	private UserThirdMapper userThirdMapper;
 
-//	@Override
-//	@Transactional
-//	public void saveMain(User user, List<UserThird> userThirdList) {
-//		userMapper.insert(user);
-//		for(UserThird entity:userThirdList) {
-//			//外键设置
-//			entity.setUserId(user.getId());
-//			userThirdMapper.insert(entity);
-//		}
-//	}
-//
-//	@Override
-//	@Transactional
-//	public void updateMain(User user,List<UserThird> userThirdList) {
-//		userMapper.updateById(user);
-//
-//		//1.先删除子表数据
-//		userThirdMapper.deleteByMainId(user.getId());
-//
-//		//2.子表数据重新插入
-//		for(UserThird entity:userThirdList) {
-//			//外键设置
-//			entity.setUserId(user.getId());
-//			userThirdMapper.insert(entity);
-//		}
-//	}
+	//	@Override
+	//	@Transactional
+	//	public void saveMain(UserPostsVos user, List<UserThird> userThirdList) {
+	//		userMapper.insert(user);
+	//		for(UserThird entity:userThirdList) {
+	//			//外键设置
+	//			entity.setUserId(user.getId());
+	//			userThirdMapper.insert(entity);
+	//		}
+	//	}
+	//
+	//	@Override
+	//	@Transactional
+	//	public void updateMain(UserPostsVos user,List<UserThird> userThirdList) {
+	//		userMapper.updateById(user);
+	//
+	//		//1.先删除子表数据
+	//		userThirdMapper.deleteByMainId(user.getId());
+	//
+	//		//2.子表数据重新插入
+	//		for(UserThird entity:userThirdList) {
+	//			//外键设置
+	//			entity.setUserId(user.getId());
+	//			userThirdMapper.insert(entity);
+	//		}
+	//	}
 
 	@Override
 	@Transactional
@@ -85,10 +86,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
 	@Override
 	public User queryByMobile(String moblie) {
-		QueryWrapper<User> userInfoQueryWrapper = new QueryWrapper<>();
+/*		QueryWrapper<UserPostsVos> userInfoQueryWrapper = new QueryWrapper<>();
 		userInfoQueryWrapper.eq("mobile", moblie);
-		User userInfo = userMapper.selectOne(userInfoQueryWrapper);
-		return userInfo;
+		UserPostsVos userInfo = userMapper.selectOne(userInfoQueryWrapper);*/
+
+		return userMapper.queryByMobile(moblie);
 	}
 
 	/**
@@ -128,10 +130,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 		if(user == null){
 			return 0;
 		}
-		//随机得到盐
+		//随机得到盐h
 		String salt = oConvertUtils.randomGen(8);
 		user.setSalt(salt);
-		String passwordEncode = PasswordUtil.encrypt(user.getMobile(), password, salt);
+		String passwordEncode = PasswordUtil.encrypt(password, password, salt);
 		user.setPassword(passwordEncode);
 		return userMapper.updateById(user);
 	}
@@ -140,6 +142,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 	public User verifyUser(String chinaname, String englishname, String referrer) {
 		User user = userMapper.verifyUser(chinaname, englishname, referrer);
 		return user;
+	}
+
+	@Override
+	public String queryById(String mobile) {
+		return userMapper.queryById(mobile);
+	}
+
+	@Override
+	public List<String> queryAll() {
+		return userMapper.queryAll();
+	}
+
+	@Override
+	public List<User> getAllUser() {
+		return userMapper.getAllUser();
 	}
 
 

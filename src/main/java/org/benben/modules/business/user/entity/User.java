@@ -33,6 +33,9 @@ public class User implements Serializable {
 	/**昵称*/
 	@Excel(name = "昵称", width = 15)
 	private java.lang.String nickname;
+	/**头像*/
+	@Excel(name = "头像", width = 15)
+	private java.lang.String avatar;
 	/**密码*/
 	@Excel(name = "密码", width = 15)
 	private java.lang.String password;
@@ -60,15 +63,18 @@ public class User implements Serializable {
 	/**所在地区*/
 	@Excel(name = "所在地区", width = 15)
 	private java.lang.String address;
+	/**所在地区*/
+	@Excel(name = "所在地区编号", width = 15)
+	private java.lang.String addressCode;
 	/**所在公司*/
 	@Excel(name = "所在公司", width = 15)
 	private java.lang.String company;
-	/**头像*/
-	@Excel(name = "头像", width = 15)
-	private java.lang.String avatar;
 	/**等级*/
 	@Excel(name = "等级", width = 15)
 	private java.lang.Integer level;
+	/**预约课程状态 1/ true 0/false*/
+	@Excel(name = "预约课程状态", width = 15)
+	private java.lang.Integer reserveCourse;
 	/**性别  0/男,1/女*/
 	@Excel(name = "性别  0/男,1/女", width = 15)
 	private java.lang.Integer sex;
@@ -142,5 +148,5 @@ public class User implements Serializable {
 	private java.lang.String verification;
 	/**微信id*/
 	@Excel(name = "微信id", width = 15)
-	private java.lang.String wxId;
+	private java.lang.String openId;
 }
