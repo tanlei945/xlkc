@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/v1/validate")
-//@Api(tags = {"检测接口"})
+@Api(tags = {"检测接口"})
 public class RestValidateController {
 
     @Autowired
@@ -117,6 +117,7 @@ public class RestValidateController {
 
 
     @GetMapping("/check")
+//	@ApiOperation(value = "验证码登录",tags = {"用户接口"}, notes = "验证码登录")
     public RestResponseBean check_ems_mobile(@RequestParam(name = "mobile")String mobile, @RequestParam(name = "captcha")String captcha,
                                              @RequestParam(name = "event")String event) {
         Boolean aBoolean = validateService.captchaValidate_mobile(mobile,captcha,event);
