@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang.StringUtils;
 import org.benben.common.api.vo.RestResponseBean;
 import org.benben.common.api.vo.Result;
@@ -12,12 +11,15 @@ import org.benben.common.menu.ResultEnum;
 import org.benben.common.util.aliyun.OSSClientUtils;
 import org.benben.modules.business.commen.service.ICommonService;
 import org.benben.modules.business.commen.service.IQiniuService;
-import org.benben.modules.business.commen.service.impl.IQiniuServiceImpl;
+import org.benben.modules.business.user.entity.User;
 import org.benben.modules.business.video.entity.Video;
 import org.benben.modules.business.video.service.IVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,9 +31,9 @@ import java.io.InputStream;
  * @description:
  */
 @RestController
-@RequestMapping("/api/v1/common/")
+@RequestMapping("/file/common/")
 @Api(tags = {"通用接口"})
-public class RestCommonController {
+public class SysCommonController {
 
     @Value(value = "${benben.path.upload}")
     private String uploadpath;
@@ -57,7 +59,7 @@ public class RestCommonController {
 		String result = "";
 		Video video;
 		try {
-				result = OSSClientUtils.fileVideoUpload(files);
+			result = OSSClientUtils.fileVideoUpload(files);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,15 +68,17 @@ public class RestCommonController {
 	}
 	@PostMapping(value = "/upload_image_ali")
 	@ApiOperation(value = "学习园地上传视频封面",tags = {"学习园地接口"}, notes = "学习园地上传视频封面")
-	public RestResponseBean uploadPiture(@RequestParam(value = "file") MultipartFile[] files) {
+	public Result<String> uploadPiture(@RequestParam(value = "file") MultipartFile[] files) {
 		String result = "";
+		Result<String> results = new Result<String>();
 		try {
 			result = OSSClientUtils.fileUpload(files);
+			results.setMessage(result);
+			results.setSuccess(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return new RestResponseBean(ResultEnum.OPERATION_SUCCESS.getValue(), ResultEnum.OPERATION_SUCCESS.getDesc(), result);
+		return results;
 	}
 
 	@PostMapping("/down_file")

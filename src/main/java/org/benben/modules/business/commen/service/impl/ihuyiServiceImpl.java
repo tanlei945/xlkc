@@ -1,6 +1,8 @@
 package org.benben.modules.business.commen.service.impl;
 
 import com.google.common.base.Verify;
+import org.apache.commons.lang.StringUtils;
+import org.benben.common.util.RedisUtil;
 import org.benben.common.util.Sendsms;
 import org.benben.modules.business.commen.service.IhuyiService;
 import org.benben.modules.business.verrifycode.entity.Verifycode;
@@ -13,18 +15,20 @@ public class ihuyiServiceImpl implements IhuyiService {
 	@Autowired
 	private IVerifycodeService verifycodeService;
 
+	@Autowired
+	private  RedisUtil redisUtil;
+
 	/**
 	 * 给手机号发送验证码，并保存验证码
 	 * @param mobile
 	 * @return
 	 */
 	@Override
-	public int sendIhuyi(String mobile) {
+	public Integer sendIhuyi( String areacode, String mobile,String event) {
 
-		int verify = Sendsms.sendVerify(mobile);
-		Verifycode verifycode = new Verifycode();
-		verifycode.setVerify(verify);
-		verifycodeService.save(verifycode);
+		String phone = areacode +" "+ mobile;
+		int verify = Sendsms.sendVerify(phone);
+		redisUtil.set(mobile+","+ event,verify,300);
 		return verify;
 
 	}
@@ -35,14 +39,25 @@ public class ihuyiServiceImpl implements IhuyiService {
 	 * @return
 	 */
 	@Override
-	public boolean check(int verify) {
+	public boolean check(String mobile, String event ,Integer verify) {
 
-		Verifycode verifycode = verifycodeService.queryByVerify(verify);
-		if (verifycode == null) {
+		int num = 0;
+		//检测redis是否过期
+		if (!redisUtil.hasKey(mobile + "," + event)) {
 			return false;
-		} else {
-			return true;
 		}
+
+		Integer result = (Integer) redisUtil.get(mobile + "," + event);
+		String results = result + "";
+		String verifys = verify + "";
+		//取redis中缓存数据
+		if (!StringUtils.equals(results, verifys) || result == null) {
+			return false;
+		}
+//		//验证成功,删除redis缓存数据
+//		redisUtil.del(mobile + "," + event);
+
+		return true;
 	}
 
 }
