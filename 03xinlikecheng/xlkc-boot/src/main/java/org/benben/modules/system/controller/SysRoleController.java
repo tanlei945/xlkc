@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.netty.channel.ChannelHandler;
 import org.benben.common.api.vo.Result;
 import org.benben.common.system.query.QueryGenerator;
 import org.benben.common.util.oConvertUtils;
@@ -64,6 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/sys/role")
 @Slf4j
+@ChannelHandler.Sharable
 public class SysRoleController {
 	@Autowired
 	private ISysRoleService sysRoleService;
