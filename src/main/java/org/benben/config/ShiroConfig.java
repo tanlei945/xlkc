@@ -2,6 +2,7 @@ package org.benben.config;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
 import javax.servlet.Filter;
@@ -29,6 +30,7 @@ import org.yaml.snakeyaml.Yaml;
 
 @Configuration
 public class ShiroConfig {
+
 
 	/**
 	 * Filter Chain定义说明
@@ -63,10 +65,20 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/doc.html", "anon");
 		filterChainDefinitionMap.put("/swagger**/**", "anon");
 		filterChainDefinitionMap.put("/webjars/**", "anon");
+		filterChainDefinitionMap.put("/api/v1/user/isExistMobile", "anon");
 		filterChainDefinitionMap.put("/api/v1/user/login", "anon");
+		filterChainDefinitionMap.put("/api/v1/user/mobileLogin", "anon");
+		filterChainDefinitionMap.put("/api/v1/user/forgetPassword", "anon");
+		filterChainDefinitionMap.put("/api/v1/protocol/registerProtocol", "anon");
 		filterChainDefinitionMap.put("/api/v1/user/register", "anon");
 		filterChainDefinitionMap.put("/api/v1/sms/**", "anon");
+		filterChainDefinitionMap.put("/api/v1/WX/redirectPage", "anon");
+		filterChainDefinitionMap.put("/api/v1/WX/WXAuthorization", "anon");
+		filterChainDefinitionMap.put("/api/v1/WX/callBack", "anon");
+		filterChainDefinitionMap.put("/api/v1/WX/callBackRefund", "anon");
+		filterChainDefinitionMap.put("/api/v1/common/**", "anon");
 		filterChainDefinitionMap.put("/v2/**", "anon");
+
 
 		//性能监控
 		filterChainDefinitionMap.put("/actuator/metrics/**", "anon");
@@ -80,18 +92,17 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/api/user/login", "anon");
 
 		//从配置文件读取添加不需要token的路径
-		Yaml yaml = new Yaml();
-		URL url = ShiroConfig.class.getClassLoader().getResource("noneed-login.yml");
-		Map map = null;
+		/*Yaml yaml = new Yaml();
 		try {
-			map = yaml.load(new FileInputStream(url.getFile()));
-		} catch (FileNotFoundException e) {
+			InputStream inputStream = ShiroConfig.class.getClassLoader().getResourceAsStream("noneed-login.yml");
+			HashMap hashMap = yaml.loadAs(inputStream, HashMap.class);
+			if(hashMap!=null){
+				List<String> filterlist = (List)hashMap.get("filterlist");
+				filterlist.forEach(value->filterChainDefinitionMap.put(value,"anon"));
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		if(map!=null){
-			List<String> filterlist = (List)map.get("filterlist");
-			filterlist.forEach(value->filterChainDefinitionMap.put(value,"anon"));
-		}
+		}*/
 
 		// 添加自己的过滤器并且取名为jwt
 		Map<String, Filter> filterMap = new HashMap<String, Filter>(1);
