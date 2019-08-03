@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @Description: 关于通知的管理
  * @author： jeecg-boot
@@ -21,7 +24,12 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
 	private NoticeMapper noticeMapper;
 
 	@Override
-	public Notice queryNotice() {
-		return noticeMapper.queryNotice();
+	public List<Notice> queryNotice() {
+		List<Notice> notices = noticeMapper.queryNotice();
+		List<Notice> noticeList = new ArrayList<>();
+		for (int i = 0 ; i < 2; i++) {
+			noticeList.add(notices.get(i));
+		}
+		return noticeList;
 	}
 }

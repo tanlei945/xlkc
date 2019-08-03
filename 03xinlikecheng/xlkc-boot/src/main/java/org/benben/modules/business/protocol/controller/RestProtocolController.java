@@ -51,7 +51,7 @@ public class RestProtocolController {
 
 
    @PostMapping("/registerProtocol")
-   @ApiOperation(value = "显示注册协议接口", tags = {"注册协议接口"}, notes = "显示注册协议接口")
+   @ApiOperation(value = "显示协议接口", tags = {"注册协议接口"}, notes = "显示注册接口")
    public RestResponseBean registerProtocol(@RequestParam Integer type){
 		Protocol protocol = protocolService.queryByType(type);
 		if (protocol == null) {

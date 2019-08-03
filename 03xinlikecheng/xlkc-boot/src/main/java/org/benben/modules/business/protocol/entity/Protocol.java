@@ -28,8 +28,11 @@ public class Protocol implements Serializable {
 	@Excel(name = "content", width = 15)
 	private java.lang.Object content;
 	/**1/注册协议*/
-	@Excel(name = "1/注册协议", width = 15)
+	@Excel(name = "1/注册协议,2/付款协议", width = 15)
 	private java.lang.Integer type;
+
+	@Excel(name = "协议标题", width = 15)
+	private java.lang.String tatle;
 	/**createTime*/
 	@Excel(name = "createTime", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
