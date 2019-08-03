@@ -5,28 +5,23 @@ server:
     compression:
       enabled: true
       mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
-        
-management:
- endpoints:
-  web:
-   exposure:
-    include: metrics,httptrace
-    
+
+
 spring:
   servlet:
     multipart:
-      max-file-size: 120MB
-      max-request-size: 120MB
+      max-file-size: 240MB
+      max-request-size: 240MB
 
   mail:
     host: smtp.163.com
     username: sanshixuxian@163.com
     password: a75861943
     properties:
-      mail: 
-        smtp: 
+      mail:
+        smtp:
           auth: true
-          starttls: 
+          starttls:
             enable: true
             required: true
   ## quartz定时任务,采用数据库方式
@@ -89,8 +84,9 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://47.52.152.54:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
-#          url: jdbc:mysql://127.0.0.1:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+#          url: jdbc:mysql://47.106.98.95:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+#          url: jdbc:mysql://47.52.152.54:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+          url: jdbc:mysql://127.0.0.1:3306/xlkc-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
           username: root
           password: 1qaz2wsx
 #          password: 123456
@@ -160,3 +156,16 @@ weibo:
 mail:
   username: sanshixuxian@163.com
   password: a75861943
+
+  #微信appid
+WECHAT_APP_ID: wx29264b38531d6be5
+  #微信秘钥app_secret
+WECHAT_APP_SECRET: 953e1c27751a625c3d8b116b63457541
+  #微信商户号
+WECHAT_MCH_ID: 1520562931
+  #微信apikey 微信商户api秘钥  微信商户号
+WECHAT_API_KEY: penpen20181214penpen181818penpen
+  #微信支付回调地址 要不要无所谓 需要回调地址
+WECHAT_NOTIFY_URL: checktheorder4
+  #微信支付证书路径 (相对路径，相对于项目) 微信退款
+WECHAT_CERTIFICATE_SUB_PATH: checktheorder7
