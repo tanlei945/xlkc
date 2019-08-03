@@ -1,5 +1,6 @@
 package org.benben.modules.business.video.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.benben.modules.business.video.entity.Video;
 import org.benben.modules.business.video.mapper.VideoMapper;
 import org.benben.modules.business.video.service.IVideoService;
@@ -38,25 +39,45 @@ public class VideoServiceImpl extends ServiceImpl<VideoMapper, Video> implements
 	}
 
 	@Override
-	public List<Video> queryByTypeAndInvitecode(String invitecode) {
-		List<Video> videos = videoMapper.queryByInvitecode(invitecode);
+	public List<Video> queryByTypeAndInvitecode(String invitecode,String uid) {
+		List<Video> videos = videoMapper.queryByInvitecode(invitecode,uid);
 		if(videos == null){
 			return null;
 		}
-		for(int i = 0; i < videos.size(); i++) {
-			videoMapper.updateByState(videos.get(i).getId());
+		for (Video video : videos) {
+			if (StringUtils.isNotBlank(video.getId())){
+				for(int i = 0; i < videos.size(); i++) {
+					videoMapper.updateByState(uid,video.getId());
+				}
+			}
+
 		}
 		return videos;
 	}
 
 	@Override
-	public List<VideoVo> queryVideo() {
-		List<VideoVo> videos = videoMapper.queryVideo();
+	public List<VideoVo> queryVideo(String uid) {
+		List<VideoVo> videos = videoMapper.queryVideo(uid);
 		return videos;
 	}
 
 	@Override
-	public List<Video> queryByVidoetype(String parentId) {
-		return videoMapper.queryByVideotype(parentId);
+	public List<Video> queryByVidoetype(String parentId,String uid) {
+		return videoMapper.queryByVideotype(parentId,uid);
+	}
+
+	@Override
+	public Video queryBytype(String videoType) {
+		return videoMapper.queryBytype(videoType);
+	}
+
+	@Override
+	public List<String> query() {
+		return videoMapper.query();
+	}
+
+	@Override
+	public void addBBVideoUser(String id,String uid, String s) {
+		videoMapper.addBBVideoUser(id,uid,s);
 	}
 }

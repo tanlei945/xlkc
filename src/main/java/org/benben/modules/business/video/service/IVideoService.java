@@ -17,9 +17,15 @@ public interface IVideoService extends IService<Video> {
 
 	VideosVo queryByType(Integer pageNumber, Integer pageSize);
 
-	List<Video> queryByTypeAndInvitecode( String invitecode);
+	List<Video> queryByTypeAndInvitecode( String invitecode,String uid);
 
-	List<VideoVo> queryVideo();
+	List<VideoVo> queryVideo(String uid);
 
-	List<Video> queryByVidoetype(String parentId);
+	List<Video> queryByVidoetype(String parentId,String uid);
+
+	Video queryBytype(String videoType);
+
+	List<String> query();
+
+	void addBBVideoUser(String id, String uid, String s);
 }
